@@ -227,9 +227,14 @@ class TilePalettePanel extends SidePanel
 		var move = (scroll > 0 ? 1 : -1) * 0.25;
 		var pos = mouse;
 
-		matrix.translate(-pos.x, -pos.y);
-		matrix.scale(1 + move, 1 + move);
-		matrix.translate(pos.x, pos.y);
+		if (OGMO.ctrl) {
+			matrix.translate(-pos.x, -pos.y);
+			matrix.scale(1 + move, 1 + move);
+			matrix.translate(pos.x, pos.y);
+		} else {
+			matrix.translate(0, move * 12*4*4);
+		}
+
 		clampCamera();
 		refresh();
 	}
