@@ -19,6 +19,10 @@ class TileSelectTool extends TileTool
 		deselectTiles();
 	}
 
+    public function getSize(): Vector {
+        return new Vector(end.x - start.x, end.y - start.y);
+    }
+
 	override public function drawOverlay()
 	{
 		switch (mode) {
@@ -213,6 +217,11 @@ class TileSelectTool extends TileTool
 	override public function getName():String return 'Select';
 	override public function keyToolAlt():Int return 4;
 	override public function keyToolShift():Int return 0;
+
+    override public function getExtraInfo():String {
+        var size: Vector = getSize();
+        return " " + (Math.abs(size.x)+1) + " x " + (Math.abs(size.y)+1);
+    }
 }
 
 enum SelectModes

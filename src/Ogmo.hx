@@ -45,6 +45,7 @@ class Ogmo
 	public var ctrl(get, null):Bool;
 	public var shift(get, null):Bool;
 	public var alt(get, null):Bool;
+    public var tab(get, null):Bool;
 	public var inputFocused(get, null):Bool;
 	
 	public static function main() {
@@ -314,6 +315,11 @@ class Ogmo
 	{
 		return keyCheckMap[Keys.Alt];
 	}
+
+    function get_tab():Bool
+    {
+        return keyCheckMap[Keys.Tab];
+    }
 
 	function get_inputFocused():Bool
 	{

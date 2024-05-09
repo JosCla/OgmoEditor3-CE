@@ -47,6 +47,7 @@ class TileFlipRotationData
 class TileData
 {
 	static public inline var EMPTY_TILE = -1; // TODO - It might be nice to be able to set this to 0 -01010111
+    static public inline var NONEXIST_TILE = -2; // TODO - It might be nice to be able to set this to 0 -01010111
 
 	static public inline var FLAG_FLIP_HORIZONTAL		= 4;
 	static public inline var FLAG_FLIP_VERTICAL		= 2;
@@ -64,6 +65,8 @@ class TileData
 
 	public function copy(src:TileData):TileData
 	{
+        if (src.idx == NONEXIST_TILE) return this;
+
 		idx = src.idx;
 		flipX = src.flipX;
 		flipY = src.flipY;
@@ -83,7 +86,7 @@ class TileData
 
 	public function isEmptyTile():Bool
 	{
-		return idx == EMPTY_TILE;
+		return idx == EMPTY_TILE || idx == NONEXIST_TILE;
 	}
 
 	static public function encodeTileFlags(tile:TileData, value:Int):Int

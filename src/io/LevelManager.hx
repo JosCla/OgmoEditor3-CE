@@ -65,10 +65,12 @@ class LevelManager
 		//Check if you can open it
 		this.enforceLimit(function ()
 		{
+			
 			//Open it
 			try
 			{
 				level = Imports.level(path);
+				
 			}
 			catch (e:Dynamic)
 			{

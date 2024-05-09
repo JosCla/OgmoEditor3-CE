@@ -99,11 +99,11 @@ class DecalSelectTool extends DecalTool
 				EDITOR.dirty();
 			}
 		}
-		else if (key == Keys.V)
+		else if (key == Keys.J)
 		{
 			if ((cast layerEditor.template : DecalLayerTemplate).scaleable)
 			{
-				EDITOR.level.store("flip decal v");
+				EDITOR.level.store("flip decal j");
 				for (decal in layerEditor.selected)
 					decal.scale.y = -decal.scale.y;
 				layerEditor.selectedChanged = true;
@@ -130,6 +130,9 @@ class DecalSelectTool extends DecalTool
 			for (decal in layerEditor.selected) OGMO.shift ? moveDecalToFront(decal) : moveDecalForward(decal);
 			EDITOR.dirty();
 		}
+        else if (key == Keys.C) {
+            
+        }
 	}
 
 	function moveDecalBack(decal:Decal)

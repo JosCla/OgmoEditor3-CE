@@ -155,6 +155,17 @@ class Vector
 		return result;
 	}
 
+    public function floor(?result:Vector):Vector
+        {
+            if (result == null)
+                result = new Vector();
+    
+            result.x = Math.floor(x);
+            result.y = Math.floor(y);
+    
+            return result;
+        }
+
 	public static function load(data:Dynamic):Vector
 	{
 		return new Vector(data.x, data.y);

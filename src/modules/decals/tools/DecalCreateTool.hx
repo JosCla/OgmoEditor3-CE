@@ -13,6 +13,7 @@ class DecalCreateTool extends DecalTool
 	public var deleting:Bool = false;
 	public var firstDelete:Bool = false;
 	public var lastDeletePos:Vector = new Vector();
+    public var useTileGrid:Bool = false;
 
 	override public function drawOverlay()
 	{
@@ -38,7 +39,8 @@ class DecalCreateTool extends DecalTool
 		deleting = false;
 
 		if (layerEditor.brush == null) return;
-		if (!OGMO.ctrl) layer.snapToGrid(pos, pos);
+		if (useTileGrid) Ogmo.editor.getTileLayer().snapToGrid(pos, pos); 
+        else layer.snapToGrid(pos, pos); 
 
 		EDITOR.level.store("create decal");
 		EDITOR.locked = true;
@@ -49,7 +51,7 @@ class DecalCreateTool extends DecalTool
 		created = new Decal(pos, path, layerEditor.brush, origin, scale, 0, values);
 		layer.decals.push(created);
 
-		if (OGMO.keyCheckMap[Keys.Shift])
+		if (OGMO.ctrl)
 			layerEditor.selected.push(created);
 		else
 			layerEditor.selected = [created];
@@ -64,19 +66,24 @@ class DecalCreateTool extends DecalTool
 			created = null;
 			EDITOR.locked = false;
 
-			if (!OGMO.shift)
+			if (OGMO.shift)
 				EDITOR.toolBelt.setTool(0);
 		}
 	}
 
 	override public function onRightDown(pos:Vector)
 	{
-		created = null;
-		deleting = true;
-		lastDeletePos = pos;
-		EDITOR.locked = true;
-
-		doDelete(pos);
+        if (layerEditor.brush != null) {
+            layerEditor.brush = null;
+            EDITOR.toolBelt.setTool(0);
+        } else {
+            created = null;
+            deleting = true;
+            lastDeletePos = pos;
+            EDITOR.locked = true;
+    
+            doDelete(pos);
+        }
 	}
 
 	override public function onRightUp(pos:Vector)
@@ -106,8 +113,8 @@ class DecalCreateTool extends DecalTool
 	{
 		if (created != null)
 		{
-			if (!OGMO.ctrl)
-				layer.snapToGrid(pos, pos);
+			if (useTileGrid) Ogmo.editor.getTileLayer().snapToGrid(pos, pos); 
+            else layer.snapToGrid(pos, pos); 
 
 			if (!pos.equals(created.position))
 			{
@@ -123,14 +130,17 @@ class DecalCreateTool extends DecalTool
 				doDelete(pos);
 			}
 		}
-		else if (layerEditor.brush != null && !pos.equals(previewAt))
+		else if (layerEditor.brush != null)
 		{
-			if (!OGMO.ctrl)
-				layer.snapToGrid(pos, pos);
 
-			canPreview = true;
-			previewAt = pos;
-			EDITOR.overlayDirty();
+			if (useTileGrid) Ogmo.editor.getTileLayer().snapToGrid(pos, pos); 
+            else layer.snapToGrid(pos, pos); 
+
+            if (!pos.equals(previewAt)) {
+                canPreview = true;
+                previewAt = pos;
+                EDITOR.overlayDirty();
+            }
 		}
 	}
 
@@ -152,8 +162,11 @@ class DecalCreateTool extends DecalTool
 				EDITOR.dirty();
 			}
 		}
+        else if (key == Keys.O) {
+            useTileGrid = !useTileGrid;
+        }
 		// TODO - Prep for UX overhaul PR!
-		/*else if (key == Keys.B)
+		else if (key == Keys.B)
 		{
 			EDITOR.level.store("move decal to back");
 			for (decal in layerEditor.selected) moveDecalToBack(decal);
@@ -166,6 +179,26 @@ class DecalCreateTool extends DecalTool
 			EDITOR.dirty();
 		}
 	}
+
+    override public function onScroll(isUp:Bool) 
+    {
+        if (layerEditor.brush == null) return;
+
+        var palettePanel:Dynamic = layerEditor.palettePanel;
+        var subdirectory:Dynamic = palettePanel.subdirectory;
+        if (subdirectory == null) subdirectory = (cast layerEditor.template : DecalLayerTemplate).files;
+        var textures:Array<Dynamic> = subdirectory.textures;
+
+        if (textures.length == 0) return;
+
+        var currentIndex = textures.indexOf(layerEditor.brush);
+        currentIndex += isUp? 1 : -1;
+        if (currentIndex >= textures.length) currentIndex = 0;
+        else if (currentIndex < 0) currentIndex = textures.length - 1;
+
+        layerEditor.brush = textures[currentIndex];
+        EDITOR.overlayDirty();
+    }
 
 	function moveDecalToBack(decal:Decal)
 	{
@@ -180,10 +213,12 @@ class DecalCreateTool extends DecalTool
 		var index = layer.decals.indexOf(decal);
 		if (index < 0) return;
 		layer.decals.splice(index, 1);
-		layer.decals.push(decal);*/
+		layer.decals.push(decal);
 	}
 
 	override public function getIcon():String return "entity-create";
 	override public function getName():String return "Create";
+
+    override public function useScrolling():Bool return true;
 
 }

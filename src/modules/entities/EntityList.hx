@@ -89,6 +89,11 @@ class EntityList
 		group.clear();
 	}
 
+    public function deepCloneGroup(group:EntityGroup):Array<Entity>
+    {
+        return [for (id in group.ids) getByID(id).clone()];
+    }
+
 	public function getByID(id:Int):Entity
 	{
 		var n = indexOf(id);

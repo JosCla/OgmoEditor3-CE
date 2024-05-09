@@ -18,6 +18,7 @@ import level.editor.ui.StickerDropdown;
 import rendering.GLRenderer;
 import util.Vector;
 import util.Keys;
+import level.data.Layer;
 
 import js.node.child_process.ChildProcess as ChildProcessObject;
 
@@ -61,6 +62,8 @@ class Editor
 	var state:Null<EditorState>;
 
 	var executingPlayCommand:Null<ChildProcessObject>;
+
+    var mouseWheelDelta:Int = 0;
 
 	public function new()
 	{
@@ -206,7 +209,18 @@ class Editor
 
 			new JQuery(Browser.window).bind('mousewheel', function (e)
 			{
-				if (EDITOR.level != null && EDITOR.mouseInside && !EDITOR.middleClickMove)
+                if (EDITOR.level != null && OGMO.alt && toolBelt.current != null && toolBelt.current.useScrolling())
+                {
+                    mouseWheelDelta += (e.originalEvent).wheelDelta;
+                    if (mouseWheelDelta > 120*3) {
+                        EDITOR.toolBelt.current.onScroll(true);
+                        mouseWheelDelta = 0;
+                    } else if (mouseWheelDelta < -120*3) {
+                        EDITOR.toolBelt.current.onScroll(false);
+                        mouseWheelDelta = 0;
+                    }
+                }
+				else if (EDITOR.level != null && EDITOR.mouseInside && !EDITOR.middleClickMove)
 				{
 					var at = EDITOR.windowToCanvas(EDITOR.getEventPosition(e));
 
@@ -215,6 +229,7 @@ class Editor
 					else
 						EDITOR.level.zoomCameraAt(-1, at.x, at.y);
 				}
+                
 			});
 
 			// Editor Project Button
@@ -322,7 +337,7 @@ class Editor
 			}
 			else
 			{
-				var n = EDITOR.windowToLevel(pos).round();
+				var n = EDITOR.windowToLevel(pos).floor();
 				EDITOR.handles.onMouseMove(n);
 				if (EDITOR.toolBelt.current != null)
 					EDITOR.toolBelt.current.onMouseMove(n);
@@ -350,6 +365,10 @@ class Editor
 
 			var str = "( " + Math.round(lvl.x) + ", " + Math.round(lvl.y) + " )"
 					+ " ( " + Math.round(grid.x) + ", " + Math.round(grid.y) + " )";
+
+            if (EDITOR.toolBelt.current != null) {
+                str += EDITOR.toolBelt.current.getExtraInfo();
+            }
 
 			new JQuery(".sticker-mouse_text").text(str);
 		}
@@ -788,11 +807,61 @@ class Editor
 			case Keys.Alt:
 				if (EDITOR.level != null && !EDITOR.toolBelt.setKeyTool(key)) defaultKeyPress(key);
 			case Keys.Up:
-				if (OGMO.ctrl && EDITOR.level != null) EDITOR.setLayer(EDITOR.level.currentLayerID - 1);
+				if (OGMO.ctrl && EDITOR.level != null) doDirectionalLevel("Up");
 			case Keys.Down:
-				if (OGMO.ctrl && EDITOR.level != null) EDITOR.setLayer(EDITOR.level.currentLayerID + 1);
+				if (OGMO.ctrl && EDITOR.level != null) doDirectionalLevel("Down");
+			case Keys.Left:
+				if (OGMO.ctrl && EDITOR.level != null) doDirectionalLevel("Left");
+			case Keys.Right:
+				if (OGMO.ctrl && EDITOR.level != null) doDirectionalLevel("Right");
 		}
 	}
+
+	public function doDirectionalLevel(direction:String):Void {
+
+		for (i in 0...level.layers.length) {
+			var layer:Dynamic = level.layers[i];
+
+			if (layer.entities != null) {
+				var entities:Dynamic = layer.entities;
+
+				for (j in 0...entities.list.length) {
+					var entity:Dynamic = entities.list[j];
+
+					if (entity.template.name == "transition" && entity.values[0].value == direction) {
+						
+						var path = entity.values[1].value;
+
+						var currentPath = level.path;
+						var k = currentPath.lastIndexOf('\\');
+						
+						var newPath = currentPath.substring(0, k) + "\\" + path.substring(1); 
+						newPath += ".json";
+
+						//trace(newPath);
+						//trace(EDITOR.levelManager.get(newerPath));
+						//trace(FileSystem.exists(newPath));
+
+
+						EDITOR.levelManager.open(newPath, (level) -> {trace("here99");}, (error) -> {trace(error);});
+						
+					}
+				}
+
+			}
+
+		}
+
+	}
+
+    public function getTileLayer():Layer {
+        for (i in 0...level.layers.length) {
+			var layer:Layer = level.layers[i];
+            if (layer.template.name == "Collision") return layer;
+        }
+        trace("Tile layer not found!");
+        return null;
+    }
 
 	public function keyRepeat(key:Int):Void
 	{

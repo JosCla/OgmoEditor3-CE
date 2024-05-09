@@ -25,6 +25,10 @@ class GridSelectionTool extends GridTool
 		}	
 	}
 
+    public function getSize(): Vector {
+        return new Vector(end.x - start.x, end.y - start.y);
+    }
+
 	function selectOverlay()
 	{
 		if (rect.width <= 0 || rect.height <= 0) return;
@@ -205,6 +209,11 @@ class GridSelectionTool extends GridTool
 	override public function keyToolAlt():Int return 4;
 	override public function keyToolCtrl():Int return 3;
 	override public function keyToolShift():Int return 1;
+
+    override public function getExtraInfo():String {
+        var size: Vector = getSize();
+        return " " + size.x + " x " + size.y;
+    }
 
 }
 

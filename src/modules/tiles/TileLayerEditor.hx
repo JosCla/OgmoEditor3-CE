@@ -124,4 +124,5 @@ class TileLayerEditor extends LayerEditor
 	{
 		EDITOR.toolBelt.current.activated();
 	}
+
 }

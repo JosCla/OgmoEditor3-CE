@@ -43,7 +43,7 @@ class TileLineTool extends TileTool
 				if (layer.insideGrid(p))
 				{
 					var at = layer.gridToLevel(p);
-					EDITOR.overlay.drawTile(at.x, at.y, layer.tileset, brushAt(brush, p.x.int() - start.x.int(), p.y.int() - start.y.int(), random));
+					EDITOR.overlay.drawTile(at.x, at.y, layer.tileset, brushAt(brush, start.x.int(), start.y.int(), end.x.int(), end.y.int(), p.x.int(), p.y.int(), random));
 				}
 			}
 			EDITOR.overlay.setAlpha(1);
@@ -146,7 +146,7 @@ class TileLineTool extends TileTool
 
 			for (p in points)
 			{
-				if (layer.insideGrid(p)) layer.data[p.x.int()][p.y.int()].copy(brushAt(brush, p.x.int() - start.x.int(), p.y.int() - start.y.int(), random));
+				if (layer.insideGrid(p)) layer.data[p.x.int()][p.y.int()].copy(brushAt(brush, start.x.int(), start.y.int(), end.x.int(), start.y.int(), p.x.int(), p.y.int(), random));
 			}
 		}
 	}
@@ -173,7 +173,7 @@ class TileLineTool extends TileTool
 		{
 			if (layer.insideGrid(p))
 			{
-				if (!layer.data[p.x.int()][p.y.int()].equals(brushAt(brush, p.x.int() - start.x.int(), p.y.int() - start.y.int(), random)))
+				if (!layer.data[p.x.int()][p.y.int()].equals(brushAt(brush, start.x.int(), start.y.int(), end.x.int(), start.y.int(), p.x.int(), p.y.int(), random)))
 				{
 					ret = true;
 					break;
@@ -190,5 +190,4 @@ class TileLineTool extends TileTool
 	override public function getName():String return "Line";
 	override public function getIcon():String return "line";
 	override public function keyToolAlt():Int return 4;
-	override public function keyToolShift():Int return 0;
 }

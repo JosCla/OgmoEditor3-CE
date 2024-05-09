@@ -38,7 +38,7 @@ class TileRectangleTool extends TileTool
 			{
 				for (y in 0...rect.height.int())
 				{
-					var tile = brushAt(brush, rect.x.int() + x - start.x.int(), rect.y.int() + y - start.y.int(), random);
+					var tile = brushAt(brush, start.x.int(), start.y.int(), end.x.int(), end.y.int(), rect.x.int() + x, rect.y.int() + y, random);
 					if (!tile.isEmptyTile())
 						EDITOR.overlay.drawTile(at.x + x * layer.template.gridSize.x, at.y + y * layer.template.gridSize.y, layer.tileset, tile);
 				}
@@ -146,7 +146,7 @@ class TileRectangleTool extends TileTool
 			EDITOR.level.store("rectangle fill");
 			for (i in 0...rect.width.int())
 				for (j in 0...rect.height.int())
-					layer.data[rect.x.int() + i][rect.y.int() + j].copy(brushAt(brush, rect.x.int() + i - start.x.int(), rect.y.int() + j - start.y.int(), random));
+					layer.data[rect.x.int() + i][rect.y.int() + j].copy(brushAt(brush, start.x.int(), start.y.int(), end.x.int(), end.y.int(), rect.x.int() + i, rect.y.int() + j, random));
 		}
 	}
 
@@ -165,7 +165,7 @@ class TileRectangleTool extends TileTool
 		{
 			for (j in 0...rect.height.int())
 			{
-				if (!layer.data[rect.x.int() + i][rect.y.int() + j].equals(brushAt(brush, rect.x.int() + i - start.x.int(), rect.y.int() + j - start.y.int(), random)))
+				if (!layer.data[rect.x.int() + i][rect.y.int() + j].equals(brushAt(brush, start.x.int(), start.y.int(), end.x.int(), end.y.int(), rect.x.int() + i, rect.y.int() + j, random)))
 				{
 					ret = true;
 					break;
@@ -182,5 +182,4 @@ class TileRectangleTool extends TileTool
 	override public function getName():String return "Rectangle";
 	override public function getIcon():String return "square";
 	override public function keyToolAlt():Int return 4;
-	override public function keyToolShift():Int return 0;
 }

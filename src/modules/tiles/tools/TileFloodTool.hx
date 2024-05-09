@@ -56,7 +56,7 @@ class TileFloodTool extends TileTool
 			{
 				var pX = p.x.int();
 				var pY = p.y.int();
-				var tile = brushAt(brush, pX - posX, pY - posY, random);
+				var tile = brushAt(brush, 0, 0, 0, 0, pX - posX, pY - posY, random, true);
 
 				if (!first && !layer.data[pX][pY].equals(tile))
 				{
@@ -87,5 +87,5 @@ class TileFloodTool extends TileTool
 	override public function getName():String return "Flood Fill";
 	override public function getIcon():String return "floodfill";
 	override public function keyToolAlt():Int return 4;
-	override public function keyToolShift():Int return 0;
+    override public function keyToolShift():Int return 0;
 }

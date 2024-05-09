@@ -12,6 +12,7 @@ class Tool
 	public function onMouseMove(pos:Vector):Void {}
 	public function onMouseEnter(pos:Vector):Void {}
 	public function onMouseLeave():Void {}
+    public function onScroll(isUp:Bool):Void {}
 
 	public function onKeyPress(key:Int):Void {}
 	public function onKeyRelease(key:Int):Void {}
@@ -25,9 +26,11 @@ class Tool
 
 	public function getName():String return '';
 	public function getIcon():String return '';
+    public function getExtraInfo(): String return '';
 
 	public function keyToolShift():Int return -1;
 	public function keyToolCtrl():Int return -1;
 	public function keyToolAlt():Int return -1;
 	public function isAvailable():Bool return true;
+    public function useScrolling():Bool return false;
 }

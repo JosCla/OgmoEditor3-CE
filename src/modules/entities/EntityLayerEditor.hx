@@ -56,6 +56,8 @@ class EntityLayerEditor extends LayerEditor
 	public var brush:Int = -1;
 	public var entities(get, never):EntityList;
 
+    public var clipboard:Array<Entity> = new Array<Entity>();
+
 	private var entityTexts = new Map<Int, FloatingHTMLPropertyDisplay>();
 
 	public function new(id:Int)
@@ -219,12 +221,26 @@ class EntityLayerEditor extends LayerEditor
 				for (e in entities.getGroup(selection)) if (e.template.canFlipX) e.flippedX = !e.flippedX;
 				selection.changed = true;
 				EDITOR.dirty();
-			case Keys.V:
+			case Keys.J:
 				if (OGMO.ctrl || selection.amount <= 0) return;
-				EDITOR.level.store("flip entity v");
+				EDITOR.level.store("flip entity j");
 				for (e in entities.getGroup(selection)) if (e.template.canFlipY) e.flippedY = !e.flippedY;
 				selection.changed = true;
 				EDITOR.dirty();
+            case Keys.C:
+                if (!OGMO.ctrl || selection.amount <= 0) return;
+                EDITOR.level.store('copy entities');
+                clipboard = entities.deepCloneGroup(selection);
+                trace(clipboard);
+            case Keys.V:
+                if (!OGMO.ctrl || clipboard.length == 0) return;
+                EDITOR.level.store('paste entities');
+                var copies:Array<Entity> = [for (entity in clipboard) entity.clone()];
+                for (e in copies) e.id = layer.downcast(EntityLayer).nextID();
+                entities.addList(copies);
+                selection.set(copies);
+                trace(copies);
+                EDITOR.dirty();
 		}
 	}
 
