@@ -2,6 +2,8 @@
   <img src="assets/gfx/logo.png" alt="Ogmo Editor 3"/>
 </p>
 
+I got this to build using NPM 10.4.0, node v18.12.0
+
 ### Open Source 2D level editor written in Haxe!
 For more information, check out the [Ogmo 3 homepage](https://ogmo-editor-3.github.io/). Or just go straight to the [downloads page](https://ogmoeditor.itch.io/editor)! If you need a build for 32 bit Windows, @vontoGH has graciously made them [available here](https://github.com/vontoGH/OgmoEditor3-CE/releases)!
 

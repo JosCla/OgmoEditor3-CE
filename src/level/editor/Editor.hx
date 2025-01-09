@@ -1,5 +1,7 @@
 package level.editor;
 
+using StringTools;
+
 import js.node.ChildProcess;
 import haxe.io.Path;
 import util.Matrix;
@@ -1024,6 +1026,69 @@ class Editor
 	{
 		if (level == null) return null;
 		else return layerEditors[level.currentLayerID];
+	}
+
+	public function SaveAllLevelImages():Void 
+	{
+		var dumpFolder = FileSystem.chooseFolder("Choose target folder");
+
+		var projectPath = OGMO.project.path;
+		projectPath = projectPath.substring(0, projectPath.lastIndexOf('\\'));
+
+		var levelPaths:Array<String> = [];
+		findJsonFiles(projectPath, levelPaths);
+		
+		for (levelPath in levelPaths) 
+		{
+			trace(levelPath);
+			var newLevel = Imports.level(levelPath);
+			setLevel(newLevel);
+
+			draw.setAlpha(1);
+			draw.setupRenderTarget(level.data.size);
+
+			var i = level.layers.length - 1;
+			while(i >= 0) 
+			{
+				if (EDITOR.layerEditors[i] != null && EDITOR.layerEditors[i].visible) EDITOR.layerEditors[i].draw();
+				i--;
+			}
+
+			draw.finishDrawing();
+
+			var path = levelPath;
+			path = levelPath.substring(path.indexOf('/') + 1, path.indexOf('.'));
+			path = path.substring(path.indexOf('\\') + 1);
+			path = dumpFolder + "/" + path.replace("/", "~") + ".png";
+
+			var pixels = draw.getRenderTargetPixels();
+			FileSystem.saveRGBAToPNG(pixels, Math.floor(level.data.size.x), Math.floor(level.data.size.y), path);
+
+			draw.doneRenderTarget();
+			draw.destroyRenderTarget();
+		}
+		
+	}
+
+	// thanks chatgpt!
+	// Recursive function to search for .json files
+	public static function findJsonFiles(dir:String, jsonFiles:Array<String>):Void {
+		// Get the list of files and directories
+		trace(dir);
+		var contents:Array<String> = FileSystem.readDirectory(dir);
+		
+		for (file in contents) {
+			var fullPath:String = dir + "/" + file;
+			
+			// Check if it's a directory, and recursively search
+			if (FileSystem.exists(fullPath) && fullPath.indexOf('.') == -1) {
+				findJsonFiles(fullPath, jsonFiles);
+			} 
+			// Check if the file has a .json extension
+			else if (fullPath.substring(fullPath.length - ".json".length) == ".json") {
+				jsonFiles.push(fullPath);
+			}
+		}
 	}
 }
 

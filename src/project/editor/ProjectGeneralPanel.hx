@@ -24,6 +24,7 @@ class ProjectGeneralPanel extends ProjectEditorPanel
 	public var levelMinSize:JQuery;
 	public var levelMaxSize:JQuery;
 	public var levelValueManager:ValueTemplateManager;
+	public var exportAllAsImagesButton:JQuery;
 
 	public function new()
 	{
@@ -79,6 +80,11 @@ class ProjectGeneralPanel extends ProjectEditorPanel
 
 		// level custom fields
 		levelValueManager = new ValueTemplateManager(root, [], 'Level Values');
+
+		// export all button fields
+		exportAllAsImagesButton = Fields.createButton("save", "Export All Levels to Images");
+		exportAllAsImagesButton.on("click", SaveAllImagesToFile);
+		Fields.createSettingsBlock(root, exportAllAsImagesButton, SettingsBlock.Third, "", SettingsBlock.InlineTitle);
 	}
 
 	override function begin(reset:Bool = false):Void
@@ -114,5 +120,10 @@ class ProjectGeneralPanel extends ProjectEditorPanel
 		OGMO.project.levelMaxSize = Fields.getVector(levelMaxSize);
 		levelValueManager.save();
 		OGMO.project.levelValues = levelValueManager.values;
+	}
+
+	public function SaveAllImagesToFile():Void 
+	{
+		EDITOR.SaveAllLevelImages();
 	}
 }
