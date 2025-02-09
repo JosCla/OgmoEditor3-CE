@@ -11,6 +11,7 @@ import project.data.Project;
 import util.Matrix;
 import util.Rectangle;
 import util.Vector;
+import modules.tilesets.AutoTileset;
 
 class Level
 {
@@ -69,6 +70,8 @@ class Level
 		else load(data);
 		
 		centerCamera();
+
+		var tileset:AutoTileset = new AutoTileset(this);
 	}
 	
 	public function initLayers():Void
