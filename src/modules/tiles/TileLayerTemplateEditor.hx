@@ -8,6 +8,7 @@ class TileLayerTemplateEditor extends LayerTemplateEditor
 	public var exportMode:JQuery;
 	public var arrayMode:JQuery;
 	public var defaultTiles:JQuery = null;
+	public var isAutoTemplate:JQuery;
 
 	override function importInto(into:JQuery)
 	{
@@ -47,6 +48,10 @@ class TileLayerTemplateEditor extends LayerTemplateEditor
 			defaultTiles.val(current.string());
 			Fields.createSettingsBlock(into, defaultTiles, SettingsBlock.Full, "Default Tileset", SettingsBlock.InlineTitle);
 		}
+		
+		// is auto template chooser
+		isAutoTemplate = Fields.createCheckbox(tileTemplate.isAutoTemplate, "Is AutoTile Layer");
+		Fields.createSettingsBlock(into, isAutoTemplate, SettingsBlock.Fourth);
 	}
 
 	override function save()
@@ -56,5 +61,6 @@ class TileLayerTemplateEditor extends LayerTemplateEditor
 		tileTemplate.exportMode = Imports.integer(exportMode.val(), 0);
 		tileTemplate.arrayMode = Imports.integer(arrayMode.val(), 0);
 		if (defaultTiles != null && OGMO.project.tilesets.length > 0) tileTemplate.defaultTileset = OGMO.project.tilesets[Imports.integer(defaultTiles.val(), 0)].label;
+		tileTemplate.isAutoTemplate = Fields.getCheckbox(isAutoTemplate);
 	}
 }
