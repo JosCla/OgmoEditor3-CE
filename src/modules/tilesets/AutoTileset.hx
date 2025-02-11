@@ -25,9 +25,9 @@ class AutoTileset
             }
         }
 
-            // Popup.open("hi", "entity", allLayers, ["ok"]);
+        // Popup.open("hi", "entity", allLayers, ["ok"]);
 
-        Popup.open("gaming", "entity", "Hey there! " + centerTile.idx + " " + upperTile.idx, ["ok"]);
+        // Popup.open("gaming", "entity", "Hey there! " + centerTile.idx + " " + upperTile.idx, ["ok"]);
     }
 
     public function retile(surroundingTiles: Array<Array<TileData>>) {

@@ -14,12 +14,12 @@ class TileAutotileTool extends TileTool
 
 	override public function drawOverlay()
 	{
-        if (clickTopLeft != null && clickBottomRight != null)
+        if (isClicking())
 		{
             var rect:Rectangle = getClickRect();
 		    var at = layer.gridToLevel(new Vector(clickTopLeft.x, clickTopLeft.y));
-		    var w = rect.width * layer.template.gridSize.x;
-		    var h = rect.height * layer.template.gridSize.y;
+		    var w = (rect.width + 1) * layer.template.gridSize.x;
+		    var h = (rect.height + 1) * layer.template.gridSize.y;
 		    EDITOR.overlay.drawRect(at.x, at.y, w, h, Color.green.x(0.1));
 		    EDITOR.overlay.drawRectLines(at.x, at.y, w, h, Color.green);		
 		}
@@ -40,39 +40,54 @@ class TileAutotileTool extends TileTool
 	override public function onMouseDown(pos:Vector)
 	{
 		layer.levelToGrid(pos, pos);
-        pos.clone(clickTopLeft);
-        pos.clone(clickBottomRight);
+        clickTopLeft = new Vector(pos.x, pos.y);
+        clickBottomRight = new Vector(pos.x, pos.y);
+		EDITOR.overlayDirty();
 
+        //Popup.open("hi", "entity", "you just clicked: " + clickTopLeft, ["sure."]);
 	}
 
 	override public function onMouseUp(pos:Vector)
 	{
         // todo
 
-        Popup.open("hi", "entity", "here it is: " + clickTopLeft.x, ["sure."]);
+        // Popup.open("hi", "entity", "here it is: " + clickTopLeft.x, ["sure."]);
         clickTopLeft = null;
         clickBottomRight = null;
+		EDITOR.overlayDirty();
 	}
 
 	override public function onMouseMove(pos:Vector)
 	{
-		layer.levelToGrid(pos, pos);
+        if (isClicking())
+        {
+		    layer.levelToGrid(pos, pos);
 
-        var newTopLeft:Vector = new Vector(
-            Math.min(Math.min(pos.x, clickTopLeft.x), clickBottomRight.x).max(0).min(layer.gridCellsX - 1),
-            Math.min(Math.min(pos.y, clickTopLeft.y), clickBottomRight.y).max(0).min(layer.gridCellsY - 1),
-        );
-        var newBottomRight:Vector = new Vector(
-            Math.max(Math.max(pos.x, clickTopLeft.x), clickBottomRight.x).max(0).min(layer.gridCellsX - 1),
-            Math.max(Math.max(pos.y, clickTopLeft.y), clickBottomRight.y).max(0).min(layer.gridCellsY - 1),
-        );
+            var newTopLeft:Vector = new Vector(
+                Math.min(Math.min(pos.x, clickTopLeft.x), clickBottomRight.x).max(0).min(layer.gridCellsX - 1),
+                Math.min(Math.min(pos.y, clickTopLeft.y), clickBottomRight.y).max(0).min(layer.gridCellsY - 1),
+            );
+            var newBottomRight:Vector = new Vector(
+                Math.max(Math.max(pos.x, clickTopLeft.x), clickBottomRight.x).max(0).min(layer.gridCellsX - 1),
+                Math.max(Math.max(pos.y, clickTopLeft.y), clickBottomRight.y).max(0).min(layer.gridCellsY - 1),
+            );
 
-        clickTopLeft = newTopLeft;
-        clickBottomRight = newBottomRight;
+            clickTopLeft = newTopLeft;
+            clickBottomRight = newBottomRight;
+
+		    EDITOR.overlayDirty();
+        }
 	}
+
+    public function isClicking()
+    {
+        return (clickTopLeft != null && clickBottomRight != null);
+    }
 
     public function getClickRect()
     {
+        if (!isClicking()) return null;
+
         return new Rectangle(
             clickTopLeft.x, clickTopLeft.y
             , (clickBottomRight.x - clickTopLeft.x), (clickBottomRight.y - clickTopLeft.y)
@@ -90,6 +105,8 @@ class TileAutotileTool extends TileTool
 	override public function keyToolShift():Int return 0;
 
     override public function getExtraInfo():String {
+        if (!isClicking()) return "";
+
         var rect: Rectangle = getClickRect();
         var size: Vector = new Vector(rect.width, rect.height);
         return " " + (Math.abs(size.x)+1) + " x " + (Math.abs(size.y)+1);
