@@ -25,6 +25,7 @@ class ProjectGeneralPanel extends ProjectEditorPanel
 	public var levelMaxSize:JQuery;
 	public var levelValueManager:ValueTemplateManager;
 	public var exportAllAsImagesButton:JQuery;
+	public var autoTilesetDir:JQuery;
 
 	public function new()
 	{
@@ -84,7 +85,11 @@ class ProjectGeneralPanel extends ProjectEditorPanel
 		// export all button fields
 		exportAllAsImagesButton = Fields.createButton("save", "Export All Levels to Images");
 		exportAllAsImagesButton.on("click", SaveAllImagesToFile);
-		Fields.createSettingsBlock(root, exportAllAsImagesButton, SettingsBlock.Third, "", SettingsBlock.InlineTitle);
+		Fields.createSettingsBlock(root, exportAllAsImagesButton, SettingsBlock.Half, "", SettingsBlock.InlineTitle);
+
+		// Autotile path field
+		autoTilesetDir = Fields.createFolderpath("", true, null, function() { Fields.setPath(externalScript, ''); });
+		Fields.createSettingsBlock(root, autoTilesetDir, SettingsBlock.Half, "AutoTileset Folder", SettingsBlock.InlineTitle);
 	}
 
 	override function begin(reset:Bool = false):Void
@@ -103,6 +108,7 @@ class ProjectGeneralPanel extends ProjectEditorPanel
 		levelValueManager.inspect(null, false);
 		levelValueManager.values = OGMO.project.levelValues;
 		levelValueManager.refreshList();
+		Fields.setPath(autoTilesetDir, OGMO.project.autoTilesetDir);
 	}
 
 	override function end():Void
@@ -113,6 +119,7 @@ class ProjectGeneralPanel extends ProjectEditorPanel
 		OGMO.project.gridColor = Fields.getColor(gridColor);
 		OGMO.project.compactExport = compactExport.val() != "0";
 		OGMO.project.externalScript = Fields.getPath(externalScript);
+		OGMO.project.autoTilesetDir = Fields.getPath(autoTilesetDir);
 		OGMO.project.playCommand = Fields.getField(playCommand);
 		OGMO.project.anglesRadians = angleExport.val() == "0";
 		OGMO.project.layerGridDefaultSize = Fields.getVector(layerGridDefaultSize);
