@@ -751,7 +751,14 @@ class Editor
 				defaultKeyPress(key);
 			case Keys.Space:
 				//Center Camera
-				if (OGMO.ctrl && EDITOR.level != null) EDITOR.level.centerCamera();
+				if (OGMO.ctrl && EDITOR.level != null)
+				{
+					EDITOR.level.centerCamera();
+				}
+				else
+				{
+					defaultKeyPress(key);
+				}
 			case Keys.G:
 				//Toggle Grid
 				if (OGMO.ctrl && EDITOR.level != null)

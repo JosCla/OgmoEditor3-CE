@@ -70,8 +70,6 @@ class Level
 		else load(data);
 		
 		centerCamera();
-
-		var tileset:AutoTileset = new AutoTileset(this);
 	}
 	
 	public function initLayers():Void
