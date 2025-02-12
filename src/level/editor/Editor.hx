@@ -567,6 +567,13 @@ class Editor
 		return layerEditors[id].visible;
 	}
 
+	public function setLayerVisibility(id:Int, visible:Bool):Void
+	{
+		layerEditors[id].visible = visible;
+		EDITOR.layersPanel.buttons[id].updateEyeIcon(visible);
+		EDITOR.dirty();
+	}
+
 	/*
 		ACTUAL DRAWING
 	*/
