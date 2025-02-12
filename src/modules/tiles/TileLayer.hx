@@ -75,6 +75,16 @@ class TileData
 		return this;
 	}
 
+	public function clone():TileData
+	{
+		var res:TileData = new TileData(this.idx);
+		res.flipX = this.flipX;
+		res.flipY = this.flipY;
+		res.flipDiagonally = this.flipDiagonally;
+
+		return res;
+	}
+
 	public function equals(rhs:TileData):Bool
 	{
 		return

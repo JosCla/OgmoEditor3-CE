@@ -125,7 +125,7 @@ class TileAutotileTool extends TileTool
             for (colOffset in 0...rect.width.int()) {
                 var col:Int = colOffset + rect.x.int();
 
-                layer.data[col][row] = res[colOffset][rowOffset];
+                layer.data[col][row].copy(res[colOffset][rowOffset]);
             }
         }
 
