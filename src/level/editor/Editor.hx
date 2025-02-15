@@ -1,5 +1,6 @@
 package level.editor;
 
+import modules.tilesets.AutoTileset;
 using StringTools;
 
 import js.node.ChildProcess;
@@ -46,6 +47,7 @@ class Editor
 	public var isOverlayDirty:Bool = false;
 	public var currentLayerEditor(get, null):LayerEditor;
 	public var propertyDisplayDropdown: PropertyDisplayDropdown;
+	public var autoTilesets:Map<Int, AutoTileset> = new Map<Int, AutoTileset>();
 
 	var lastArrows: Vector = new Vector();
 	var mouseMoving:Bool = false;
@@ -406,6 +408,7 @@ class Editor
 			draw.updateCanvasSize();
 			overlay.updateCanvasSize();
 			updateZoomReadout();
+			loadAutoTilesets();
 		}
 		else
 		{
@@ -1103,6 +1106,28 @@ class Editor
 				jsonFiles.push(fullPath);
 			}
 		}
+	}
+
+	public function loadAutoTilesets():Void {
+		autoTilesets = new Map<Int, AutoTileset>();
+		var basePath:String = OGMO.project.autoTilesetDir;
+		if (basePath == null || basePath == '') return;
+
+		var levelPaths:Array<String> = [];
+		findJsonFiles(basePath, levelPaths);
+
+		for (levelPath in levelPaths) {
+			var levelData = FileSystem.loadJSON(levelPath);
+			if (levelData.ogmoVersion != null && levelData.layers != null)
+			{
+				var level:Level = new Level(OGMO.project, levelData);
+				var autoTileset:AutoTileset = new AutoTileset(level);
+
+				autoTilesets[autoTileset.keyIndex] = autoTileset;
+			}
+		}
+
+		// Popup.open("hi", "entity", [for (k in autoTilesets.keys()) k].join(','), ["wow"]);
 	}
 }
 

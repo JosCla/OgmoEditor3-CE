@@ -9,6 +9,8 @@ class AutoTileset
 {
     public var level:Level;
 
+    public var keyIndex:Int;
+
     public function new(level:Level) {
         this.level = level;
 
@@ -22,6 +24,9 @@ class AutoTileset
     }
 
     public function retile(surroundingTiles: Array<Array<TileData>>):TileData {return null;}
-    public function parseTiles(collisionLayer:TileLayer):Void {}
+    public function parseTiles(collisionLayer:TileLayer):Void
+    {
+        this.keyIndex = collisionLayer.data[0][0].idx;
+    }
 }
 
