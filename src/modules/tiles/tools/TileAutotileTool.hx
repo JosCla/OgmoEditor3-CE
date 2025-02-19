@@ -1,5 +1,7 @@
 package modules.tiles.tools;
 
+import level.data.Layer;
+import modules.tilesets.AutoTileset;
 import modules.tilesets.TopLayerTileset;
 import util.Random;
 import modules.tiles.TileLayer.TileData;
@@ -9,8 +11,6 @@ class TileAutotileTool extends TileTool
     public var clickTopLeft:Vector = null;
     public var clickBottomRight:Vector = null;
     public var random:Random = new Random();
-
-    public var testTileset:TopLayerTileset;
 
     public static var greyTile:Int = 544;
 
@@ -31,7 +31,6 @@ class TileAutotileTool extends TileTool
     {
         clickTopLeft = null;
         clickBottomRight = null;
-        this.testTileset = new TopLayerTileset(layer.level);
     }
 
     override public function onMouseDown(pos:Vector)
@@ -104,17 +103,28 @@ class TileAutotileTool extends TileTool
 
     public function autoTileRect(rect:Rectangle)
     {
-        var res:Array<Array<TileData>> = [for (x in 0...rect.width.int()) [for (y in 0...rect.height.int()) new TileData()]];
+        // first getting the autotile layer
+        var autoTileLayer:TileLayer = null;
+        for (i in 0...layer.level.layers.length) {
+            var currLayer:Layer = layer.level.layers[i];
+            if (currLayer.template.name.toLowerCase() == "autotile" && Std.isOfType(currLayer, TileLayer)) {
+                autoTileLayer = cast currLayer;
+                break;
+            }
+        }
+        if (autoTileLayer == null) return;
 
         // building autotile result
+        var res:Array<Array<TileData>> = [for (x in 0...rect.width.int()) [for (y in 0...rect.height.int()) new TileData()]];
         for (rowOffset in 0...rect.height.int()) {
             var row:Int = rowOffset + rect.y.int();
             for (colOffset in 0...rect.width.int()) {
                 var col:Int = colOffset + rect.x.int();
 
                 var section = getAutoTileSection(row, col);
+                var autoTileset = getAutoTileset(autoTileLayer, row, col);
 
-                res[colOffset][rowOffset] = testTileset.retile(section);
+                res[colOffset][rowOffset] = autoTileset.retile(section);
             }
         }
 
@@ -131,6 +141,19 @@ class TileAutotileTool extends TileTool
 
         // (marking editor as dirty)
         EDITOR.dirty();
+    }
+
+    private function getAutoTileset(autoTileLayer:TileLayer, row:Int, col:Int):AutoTileset
+    {
+        var keyIdx:Int = autoTileLayer.data[col][row].idx;
+        var lastMapKey:Int = 0;
+
+        for (key in EDITOR.autoTilesets.keys()) {
+            if (key == keyIdx) return EDITOR.autoTilesets[key];
+            lastMapKey = key;
+        }
+
+        return EDITOR.autoTilesets[lastMapKey];
     }
 
     private function getAutoTileSection(centerRow:Int, centerCol:Int)

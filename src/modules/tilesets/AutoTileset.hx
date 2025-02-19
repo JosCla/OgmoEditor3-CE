@@ -23,7 +23,7 @@ class AutoTileset
         }
     }
 
-    public function retile(surroundingTiles: Array<Array<TileData>>):TileData {return null;}
+    public function retile(surroundingTiles: Array<Array<TileData>>):TileData {return new TileData();}
     public function parseTiles(collisionLayer:TileLayer):Void
     {
         this.keyIndex = collisionLayer.data[0][0].idx;

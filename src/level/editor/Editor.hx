@@ -1,5 +1,6 @@
 package level.editor;
 
+import modules.tilesets.TopLayerTileset;
 import modules.tilesets.AutoTileset;
 using StringTools;
 
@@ -1108,10 +1109,12 @@ class Editor
 		}
 	}
 
-	public function loadAutoTilesets():Void {
+	public function loadAutoTilesets():Void
+	{
 		autoTilesets = new Map<Int, AutoTileset>();
-		var basePath:String = OGMO.project.autoTilesetDir;
-		if (basePath == null || basePath == '') return;
+		var basePathRel:String = OGMO.project.autoTilesetDir;
+		if (basePathRel == null || basePathRel == '') return;
+		var basePath:String = OGMO.project.getAbsoluteLevelPath(basePathRel);
 
 		var levelPaths:Array<String> = [];
 		findJsonFiles(basePath, levelPaths);
@@ -1121,13 +1124,28 @@ class Editor
 			if (levelData.ogmoVersion != null && levelData.layers != null)
 			{
 				var level:Level = new Level(OGMO.project, levelData);
-				var autoTileset:AutoTileset = new AutoTileset(level);
+				var autoTileset:AutoTileset = getAutoTileset(level);
 
 				autoTilesets[autoTileset.keyIndex] = autoTileset;
 			}
 		}
 
 		// Popup.open("hi", "entity", [for (k in autoTilesets.keys()) k].join(','), ["wow"]);
+	}
+
+	public function getAutoTileset(level:Level):AutoTileset
+	{
+		var tilesetType:String = "";
+		for (val in level.values) {
+			if (val.template.name == "tilesetType") {
+				tilesetType = cast val.value;
+			}
+		}
+
+		switch (tilesetType) {
+			default:
+				return new TopLayerTileset(level);
+		}
 	}
 }
 
