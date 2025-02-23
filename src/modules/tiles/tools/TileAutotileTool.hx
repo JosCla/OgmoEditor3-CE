@@ -115,14 +115,15 @@ class TileAutotileTool extends TileTool
         if (autoTileLayer == null) return;
 
         // building autotile result
-        var res:Array<Array<TileData>> = [for (x in 0...rect.width.int()) [for (y in 0...rect.height.int()) layer.data[x][y]]];
+        var res:Array<Array<TileData>> = [for (x in 0...rect.width.int()) [for (y in 0...rect.height.int()) layer.data[rect.x.int() + x][rect.y.int() + y]]];
+        var autoTilerMap:Map<Int, AutoTileset> = new Map<Int, AutoTileset>();
         for (rowOffset in 0...rect.height.int()) {
             var row:Int = rowOffset + rect.y.int();
             for (colOffset in 0...rect.width.int()) {
                 var col:Int = colOffset + rect.x.int();
 
                 var section = getAutoTileSection(row, col);
-                var autoTileset = getAutoTileset(autoTileLayer, row, col);
+                var autoTileset = getAutoTileset(autoTileLayer, row, col, autoTilerMap);
                 if (autoTileset == null) continue;
 
                 res[colOffset][rowOffset] = autoTileset.retile(section);
@@ -144,16 +145,21 @@ class TileAutotileTool extends TileTool
         EDITOR.dirty();
     }
 
-    private function getAutoTileset(autoTileLayer:TileLayer, row:Int, col:Int):AutoTileset
+    private function getAutoTileset(autoTileLayer:TileLayer, row:Int, col:Int, autoTilerMap:Map<Int, AutoTileset>):AutoTileset
     {
         var keyIdx:Int = autoTileLayer.data[col][row].idx;
-        var lastMapKey:Int = 0;
 
-        for (key in EDITOR.autoTilesets.keys()) {
-            if (key == keyIdx) return EDITOR.autoTilesets[key];
-            lastMapKey = key;
+        // checking if we've already cached this autotileset
+        if (autoTilerMap[keyIdx] != null) return autoTilerMap[keyIdx];
+
+        // recreating it if we haven't but it's a valid path
+        if (EDITOR.autoTilesets[keyIdx] != null) {
+            var res:AutoTileset = EDITOR.getAutoTilesetFromPath(EDITOR.autoTilesets[keyIdx]);
+            autoTilerMap[keyIdx] = res;
+            return res;
         }
 
+        // else returning null
         return null;
     }
 

@@ -48,7 +48,7 @@ class Editor
 	public var isOverlayDirty:Bool = false;
 	public var currentLayerEditor(get, null):LayerEditor;
 	public var propertyDisplayDropdown: PropertyDisplayDropdown;
-	public var autoTilesets:Map<Int, AutoTileset> = new Map<Int, AutoTileset>();
+	public var autoTilesets:Map<Int, String> = new Map<Int, String>();
 
 	var lastArrows: Vector = new Vector();
 	var mouseMoving:Bool = false;
@@ -1111,7 +1111,7 @@ class Editor
 
 	public function loadAutoTilesets():Void
 	{
-		autoTilesets = new Map<Int, AutoTileset>();
+		autoTilesets = new Map<Int, String>();
 		var basePathRel:String = OGMO.project.autoTilesetDir;
 		if (basePathRel == null || basePathRel == '') return;
 		var basePath:String = OGMO.project.getAbsoluteLevelPath(basePathRel);
@@ -1120,17 +1120,26 @@ class Editor
 		findJsonFiles(basePath, levelPaths);
 
 		for (levelPath in levelPaths) {
-			var levelData = FileSystem.loadJSON(levelPath);
-			if (levelData.ogmoVersion != null && levelData.layers != null)
-			{
-				var level:Level = new Level(OGMO.project, levelData);
-				var autoTileset:AutoTileset = getAutoTileset(level);
-
-				autoTilesets[autoTileset.keyIndex] = autoTileset;
-			}
+			var autoTileset:AutoTileset = getAutoTilesetFromPath(levelPath);
+			if (autoTileset != null)
+				autoTilesets[autoTileset.keyIndex] = levelPath;
 		}
 
 		// Popup.open("hi", "entity", [for (k in autoTilesets.keys()) k].join(','), ["wow"]);
+	}
+
+	public function getAutoTilesetFromPath(levelPath:String):AutoTileset
+	{
+		var levelData = FileSystem.loadJSON(levelPath);
+		if (levelData.ogmoVersion != null && levelData.layers != null)
+		{
+			var level:Level = new Level(OGMO.project, levelData);
+			var autoTileset:AutoTileset = getAutoTileset(level);
+
+			return autoTileset;
+		}
+
+		return null;
 	}
 
 	public function getAutoTileset(level:Level):AutoTileset
