@@ -48,7 +48,6 @@ class Editor
 	public var isOverlayDirty:Bool = false;
 	public var currentLayerEditor(get, null):LayerEditor;
 	public var propertyDisplayDropdown: PropertyDisplayDropdown;
-	public var autoTilesets:Map<Int, String> = new Map<Int, String>();
 
 	var lastArrows: Vector = new Vector();
 	var mouseMoving:Bool = false;
@@ -409,7 +408,6 @@ class Editor
 			draw.updateCanvasSize();
 			overlay.updateCanvasSize();
 			updateZoomReadout();
-			loadAutoTilesets();
 		}
 		else
 		{
@@ -1109,11 +1107,10 @@ class Editor
 		}
 	}
 
-	public function loadAutoTilesets():Void
+	public function getAutoTileset(keyIdx:Int):AutoTileset
 	{
-		autoTilesets = new Map<Int, String>();
 		var basePathRel:String = OGMO.project.autoTilesetDir;
-		if (basePathRel == null || basePathRel == '') return;
+		if (basePathRel == null || basePathRel == '') return null;
 		var basePath:String = OGMO.project.getAbsoluteLevelPath(basePathRel);
 
 		var levelPaths:Array<String> = [];
@@ -1121,11 +1118,10 @@ class Editor
 
 		for (levelPath in levelPaths) {
 			var autoTileset:AutoTileset = getAutoTilesetFromPath(levelPath);
-			if (autoTileset != null)
-				autoTilesets[autoTileset.keyIndex] = levelPath;
+			if (autoTileset != null && autoTileset.keyIndex == keyIdx) return autoTileset;
 		}
 
-		// Popup.open("hi", "entity", [for (k in autoTilesets.keys()) k].join(','), ["wow"]);
+		return null;
 	}
 
 	public function getAutoTilesetFromPath(levelPath:String):AutoTileset
@@ -1134,7 +1130,7 @@ class Editor
 		if (levelData.ogmoVersion != null && levelData.layers != null)
 		{
 			var level:Level = new Level(OGMO.project, levelData);
-			var autoTileset:AutoTileset = getAutoTileset(level);
+			var autoTileset:AutoTileset = getAutoTilesetFromLevel(level);
 
 			return autoTileset;
 		}
@@ -1142,7 +1138,7 @@ class Editor
 		return null;
 	}
 
-	public function getAutoTileset(level:Level):AutoTileset
+	public function getAutoTilesetFromLevel(level:Level):AutoTileset
 	{
 		var tilesetType:String = "";
 		for (val in level.values) {

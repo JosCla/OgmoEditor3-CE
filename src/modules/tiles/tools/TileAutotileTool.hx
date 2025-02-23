@@ -148,19 +148,17 @@ class TileAutotileTool extends TileTool
     private function getAutoTileset(autoTileLayer:TileLayer, row:Int, col:Int, autoTilerMap:Map<Int, AutoTileset>):AutoTileset
     {
         var keyIdx:Int = autoTileLayer.data[col][row].idx;
+        if (keyIdx < 0) return null;
 
         // checking if we've already cached this autotileset
         if (autoTilerMap[keyIdx] != null) return autoTilerMap[keyIdx];
 
-        // recreating it if we haven't but it's a valid path
-        if (EDITOR.autoTilesets[keyIdx] != null) {
-            var res:AutoTileset = EDITOR.getAutoTilesetFromPath(EDITOR.autoTilesets[keyIdx]);
-            autoTilerMap[keyIdx] = res;
-            return res;
+        // trying to recreate it if we haven't already
+        var newAutoTileset:AutoTileset = EDITOR.getAutoTileset(keyIdx);
+        if (newAutoTileset != null) {
+            autoTilerMap[keyIdx] = newAutoTileset;
         }
-
-        // else returning null
-        return null;
+        return newAutoTileset;
     }
 
     private function getAutoTileSection(centerRow:Int, centerCol:Int)
