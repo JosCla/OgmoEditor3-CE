@@ -115,7 +115,7 @@ class TileAutotileTool extends TileTool
         if (autoTileLayer == null) return;
 
         // building autotile result
-        var res:Array<Array<TileData>> = [for (x in 0...rect.width.int()) [for (y in 0...rect.height.int()) new TileData()]];
+        var res:Array<Array<TileData>> = [for (x in 0...rect.width.int()) [for (y in 0...rect.height.int()) layer.data[x][y]]];
         for (rowOffset in 0...rect.height.int()) {
             var row:Int = rowOffset + rect.y.int();
             for (colOffset in 0...rect.width.int()) {
@@ -123,6 +123,7 @@ class TileAutotileTool extends TileTool
 
                 var section = getAutoTileSection(row, col);
                 var autoTileset = getAutoTileset(autoTileLayer, row, col);
+                if (autoTileset == null) continue;
 
                 res[colOffset][rowOffset] = autoTileset.retile(section);
             }
@@ -153,7 +154,7 @@ class TileAutotileTool extends TileTool
             lastMapKey = key;
         }
 
-        return EDITOR.autoTilesets[lastMapKey];
+        return null;
     }
 
     private function getAutoTileSection(centerRow:Int, centerCol:Int)
