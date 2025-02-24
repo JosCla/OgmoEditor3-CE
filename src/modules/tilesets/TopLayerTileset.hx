@@ -1,5 +1,6 @@
 package modules.tilesets;
 
+import modules.tilesets.CollisionTypes.CollisionType;
 import modules.tiles.TileLayer;
 import level.data.Level;
 import modules.tiles.TileLayer.TileData;
@@ -10,8 +11,11 @@ class TopLayerTileset extends AutoTileset
     public var upperTile:TileData;
 
     override function retile(surroundingTiles: Array<Array<TileData>>):TileData {
-        if (surroundingTiles[1][1].isEmptyTile()) return surroundingTiles[1][1];
-        if (surroundingTiles[1][0].isEmptyTile()) return this.upperTile;
+        var currCenterTile:TileData = surroundingTiles[1][1];
+        var currUpperTile:TileData = surroundingTiles[1][0];
+
+        if (EDITOR.collisionTypes.getCollisionType(currCenterTile) != CollisionType.Solid) return currCenterTile;
+        if (EDITOR.collisionTypes.getCollisionType(currUpperTile) != CollisionType.Solid) return this.upperTile;
         return this.centerTile;
     }
 

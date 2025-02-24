@@ -1,7 +1,5 @@
 package level.editor;
 
-import modules.tilesets.TopLayerTileset;
-import modules.tilesets.AutoTileset;
 using StringTools;
 
 import js.node.ChildProcess;
@@ -23,6 +21,9 @@ import rendering.GLRenderer;
 import util.Vector;
 import util.Keys;
 import level.data.Layer;
+import modules.tilesets.CollisionTypes;
+import modules.tilesets.TopLayerTileset;
+import modules.tilesets.AutoTileset;
 
 import js.node.child_process.ChildProcess as ChildProcessObject;
 
@@ -48,6 +49,7 @@ class Editor
 	public var isOverlayDirty:Bool = false;
 	public var currentLayerEditor(get, null):LayerEditor;
 	public var propertyDisplayDropdown: PropertyDisplayDropdown;
+	public var collisionTypes:CollisionTypes;
 
 	var lastArrows: Vector = new Vector();
 	var mouseMoving:Bool = false;
@@ -408,6 +410,7 @@ class Editor
 			draw.updateCanvasSize();
 			overlay.updateCanvasSize();
 			updateZoomReadout();
+			loadCollisionTypes();
 		}
 		else
 		{
@@ -1150,6 +1153,20 @@ class Editor
 		switch (tilesetType) {
 			default:
 				return new TopLayerTileset(level);
+		}
+	}
+
+	public function loadCollisionTypes():Void
+	{
+		this.collisionTypes = new CollisionTypes();
+
+		var atlasPath:String = OGMO.project.getAbsoluteLevelPath('atlas.json');
+
+		var levelData = FileSystem.loadJSON(atlasPath);
+		if (levelData.ogmoVersion != null && levelData.layers != null)
+		{
+			var level:Level = new Level(OGMO.project, levelData);
+			this.collisionTypes.initialize(level);
 		}
 	}
 }
