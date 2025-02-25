@@ -1,5 +1,6 @@
 package level.editor;
 
+import modules.tilesets.NormalTileset;
 using StringTools;
 
 import js.node.ChildProcess;
@@ -1151,6 +1152,8 @@ class Editor
 		}
 
 		switch (tilesetType) {
+			case "normal":
+				return new NormalTileset(level);
 			default:
 				return new TopLayerTileset(level);
 		}

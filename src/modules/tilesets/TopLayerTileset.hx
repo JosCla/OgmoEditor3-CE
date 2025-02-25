@@ -2,7 +2,6 @@ package modules.tilesets;
 
 import modules.tilesets.CollisionTypes.CollisionType;
 import modules.tiles.TileLayer;
-import level.data.Level;
 import modules.tiles.TileLayer.TileData;
 
 class TopLayerTileset extends AutoTileset
