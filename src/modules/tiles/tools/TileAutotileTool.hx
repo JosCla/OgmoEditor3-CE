@@ -167,9 +167,9 @@ class TileAutotileTool extends TileTool
         var layerHeight:Int = layer.data[0].length;
 
         var res:Array<Array<TileData>> = [for (x in 0...3) [for (y in 0...3) new TileData()]];
-        for (dX in -1...1) {
+        for (dX in -1...2) {
             var col:Int = centerCol + dX;
-            for (dY in -1...1) {
+            for (dY in -1...2) {
                 var row:Int = centerRow + dY;
                 if (row >= 0 && row < layerHeight && col >= 0 && col < layerWidth)
                     res[dX+1][dY+1] = layer.data[col][row];

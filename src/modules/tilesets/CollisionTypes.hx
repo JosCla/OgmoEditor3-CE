@@ -78,4 +78,8 @@ class CollisionTypes {
             if (currData.idx >= 0) collisionTypeMap[currData.idx] = rowType;
         }
     }
+
+    public static function platformOrSolid(collisionType:CollisionType):Bool {
+        return (collisionType == CollisionType.Solid || collisionType == CollisionType.SolidPlatform || collisionType == CollisionType.SemisolidPlatform);
+    }
 }
