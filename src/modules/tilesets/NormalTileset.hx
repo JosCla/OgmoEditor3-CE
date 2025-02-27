@@ -71,10 +71,10 @@ class NormalTileset extends AutoTileset
         if (currCenterCollision != CollisionType.Solid) return currCenterTile;
 
         if (currUpTile != CollisionType.Solid) {
-            if (currDownTile != CollisionType.Solid) return horizCenterTile;
-            if (currLeftTile != CollisionType.Solid && currRightTile != CollisionType.Solid) return vertUpTile;
             if (currLeftTile != CollisionType.Solid && currDownTile != CollisionType.Solid) return horizLeftTile;
             if (currRightTile != CollisionType.Solid && currDownTile != CollisionType.Solid) return horizRightTile;
+            if (currDownTile != CollisionType.Solid) return horizCenterTile;
+            if (currLeftTile != CollisionType.Solid && currRightTile != CollisionType.Solid) return vertUpTile;
             if (currLeftTile != CollisionType.Solid) return upLeftTile;
             if (currRightTile != CollisionType.Solid) return upRightTile;
             return upTile;

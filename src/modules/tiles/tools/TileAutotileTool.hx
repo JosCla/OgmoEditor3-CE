@@ -94,10 +94,19 @@ class TileAutotileTool extends TileTool
     {
         if (key == Keys.Space)
         {
-            autoTileRect(new Rectangle(
+            var rect:Rectangle = new Rectangle(
                 0, 0,
                 layer.data.length, layer.data[0].length
-            ));
+            );
+
+            if (OGMO.shift) {
+                if (layerEditor.brush.length == 0) return;
+                if (layerEditor.brush[0].length == 0) return;
+                var brushData:TileData = layerEditor.brush[0][0];
+                autoTileRectWithInd(rect, brushData.idx);
+            } else {
+                autoTileRect(rect);
+            }
         }
     }
 
@@ -126,6 +135,38 @@ class TileAutotileTool extends TileTool
                 var autoTileset = getAutoTileset(autoTileLayer, row, col, autoTilerMap);
                 if (autoTileset == null) continue;
 
+                res[colOffset][rowOffset] = autoTileset.retile(section);
+            }
+        }
+
+        // pasting autotile result
+		EDITOR.level.store("autotile");
+        for (rowOffset in 0...rect.height.int()) {
+            var row:Int = rowOffset + rect.y.int();
+            for (colOffset in 0...rect.width.int()) {
+                var col:Int = colOffset + rect.x.int();
+
+                layer.data[col][row].copy(res[colOffset][rowOffset]);
+            }
+        }
+
+        // (marking editor as dirty)
+        EDITOR.dirty();
+    }
+
+    public function autoTileRectWithInd(rect:Rectangle, keyIdx:Int)
+    {
+        // trying to build an autotiler from the provided index
+        var autoTileset:AutoTileset = EDITOR.getAutoTileset(keyIdx);
+        if (autoTileset == null) return;
+
+        // building autotile result
+        var res:Array<Array<TileData>> = [for (x in 0...rect.width.int()) [for (y in 0...rect.height.int()) layer.data[rect.x.int() + x][rect.y.int() + y]]];
+        for (rowOffset in 0...rect.height.int()) {
+            var row:Int = rowOffset + rect.y.int();
+            for (colOffset in 0...rect.width.int()) {
+                var col:Int = colOffset + rect.x.int();
+                var section = getAutoTileSection(row, col);
                 res[colOffset][rowOffset] = autoTileset.retile(section);
             }
         }
@@ -183,8 +224,8 @@ class TileAutotileTool extends TileTool
 
     override public function getIcon():String return 'value-color';
     override public function getName():String return 'AutoTile';
-    override public function keyToolAlt():Int return 4;
-    override public function keyToolShift():Int return 0;
+    override public function keyToolAlt():Int return 6;
+    override public function keyToolShift():Int return 6;
 
     override public function getExtraInfo():String {
         if (!isClicking()) return "";
