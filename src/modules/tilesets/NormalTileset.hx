@@ -38,6 +38,10 @@ class NormalTileset extends AutoTileset
     public var rightSolid:TileData;
 
     public var spike:TileData;
+    public var leftSpike:TileData;
+    public var rightSpike:TileData;
+    public var downSpike:TileData;
+
     public var leftNub:TileData;
     public var rightNub:TileData;
     public var leftPlatform:TileData;
@@ -51,7 +55,13 @@ class NormalTileset extends AutoTileset
         var currLeftTile:CollisionType = EDITOR.collisionTypes.getCollisionType(surroundingTiles[0][1]);
         var currRightTile:CollisionType = EDITOR.collisionTypes.getCollisionType(surroundingTiles[2][1]);
 
-        if (currCenterCollision == CollisionType.Deadly) return spike;
+        if (currCenterCollision == CollisionType.Deadly) {
+            if (CollisionTypes.platformOrSolid(currDownTile)) return spike;
+            if (currUpTile == CollisionType.Solid) return downSpike;
+            if (currLeftTile == CollisionType.Solid) return rightSpike;
+            if (currRightTile == CollisionType.Solid) return leftSpike;
+            return spike;
+        }
         if (currCenterCollision == CollisionType.LeftNub) return leftNub;
         if (currCenterCollision == CollisionType.RightNub) return rightNub;
         if (currCenterCollision == CollisionType.LeftPlatform) return leftPlatform;
@@ -137,6 +147,10 @@ class NormalTileset extends AutoTileset
         this.downRightInnerTile = collisionLayer.data[6][2].clone();
 
         this.spike = collisionLayer.data[9][1].clone();
+        this.leftSpike = collisionLayer.data[8][1].clone();
+        this.rightSpike = collisionLayer.data[10][1].clone();
+        this.downSpike = collisionLayer.data[9][2].clone();
+
         this.leftNub = collisionLayer.data[1][4].clone();
         this.rightNub = collisionLayer.data[2][4].clone();
         this.leftPlatform = collisionLayer.data[3][4].clone();
