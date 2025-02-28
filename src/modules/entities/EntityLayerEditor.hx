@@ -229,9 +229,8 @@ class EntityLayerEditor extends LayerEditor
 				EDITOR.dirty();
             case Keys.C:
                 if (!OGMO.ctrl || selection.amount <= 0) return;
-                EDITOR.level.store('copy entities');
+                //EDITOR.level.store('copy entities');
                 clipboard = entities.deepCloneGroup(selection);
-                trace(clipboard);
             case Keys.V:
                 if (!OGMO.ctrl || clipboard.length == 0) return;
                 EDITOR.level.store('paste entities');
@@ -239,7 +238,6 @@ class EntityLayerEditor extends LayerEditor
                 for (e in copies) e.id = layer.downcast(EntityLayer).nextID();
                 entities.addList(copies);
                 selection.set(copies);
-                trace(copies);
                 EDITOR.dirty();
 		}
 	}
