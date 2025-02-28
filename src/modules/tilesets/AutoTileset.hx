@@ -1,5 +1,6 @@
 package modules.tilesets;
 
+import util.Random;
 import modules.tiles.TileLayer;
 import modules.tiles.TileLayer.TileData;
 import level.data.Layer;
@@ -23,7 +24,7 @@ class AutoTileset
         }
     }
 
-    public function retile(surroundingTiles: Array<Array<TileData>>):TileData {return new TileData();}
+    public function retile(surroundingTiles: Array<Array<TileData>>, rand:Random):TileData {return new TileData();}
     public function parseTiles(collisionLayer:TileLayer):Void
     {
         this.keyIndex = collisionLayer.data[0][0].idx;

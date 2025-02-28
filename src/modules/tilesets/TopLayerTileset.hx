@@ -1,5 +1,6 @@
 package modules.tilesets;
 
+import util.Random;
 import modules.tilesets.CollisionTypes.CollisionType;
 import modules.tiles.TileLayer;
 import modules.tiles.TileLayer.TileData;
@@ -9,7 +10,7 @@ class TopLayerTileset extends AutoTileset
     public var centerTile:TileData;
     public var upperTile:TileData;
 
-    override function retile(surroundingTiles: Array<Array<TileData>>):TileData {
+    override function retile(surroundingTiles: Array<Array<TileData>>, rand:Random):TileData {
         var currCenterTile:TileData = surroundingTiles[1][1];
         var currUpperTile:TileData = surroundingTiles[1][0];
 

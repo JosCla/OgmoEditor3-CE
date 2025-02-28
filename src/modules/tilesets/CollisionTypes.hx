@@ -15,6 +15,7 @@ enum CollisionType {
     RightNub;
     LeftPlatform;
     RightPlatform;
+    PortalBlock;
     Other;
 }
 
@@ -70,6 +71,7 @@ class CollisionTypes {
         parseRow(collisionLayer, 19, CollisionType.Other);
         parseRow(collisionLayer, 20, CollisionType.Other);
         parseRow(collisionLayer, 21, CollisionType.Other);
+        parseRow(collisionLayer, 22, CollisionType.PortalBlock);
     }
 
     private function parseRow(collisionLayer:TileLayer, row:Int, rowType:CollisionType):Void {

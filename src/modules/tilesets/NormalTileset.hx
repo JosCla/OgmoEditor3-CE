@@ -1,5 +1,6 @@
 package modules.tilesets;
 
+import util.Random;
 import modules.tilesets.CollisionTypes.CollisionType;
 import modules.tiles.TileLayer;
 import modules.tiles.TileLayer.TileData;
@@ -7,6 +8,7 @@ import modules.tiles.TileLayer.TileData;
 class NormalTileset extends AutoTileset
 {
     public var centerTile:TileData;
+    public var centerTileVariation:TileData;
     public var upTile:TileData;
     public var downTile:TileData;
     public var leftTile:TileData;
@@ -47,7 +49,7 @@ class NormalTileset extends AutoTileset
     public var leftPlatform:TileData;
     public var rightPlatform:TileData;
 
-    override function retile(surroundingTiles: Array<Array<TileData>>):TileData {
+    override function retile(surroundingTiles: Array<Array<TileData>>, rand:Random):TileData {
         var currCenterTile:TileData = surroundingTiles[1][1];
         var currCenterCollision:CollisionType = EDITOR.collisionTypes.getCollisionType(currCenterTile);
         var currUpTile:CollisionType = EDITOR.collisionTypes.getCollisionType(surroundingTiles[1][0]);
@@ -66,6 +68,7 @@ class NormalTileset extends AutoTileset
         if (currCenterCollision == CollisionType.RightNub) return rightNub;
         if (currCenterCollision == CollisionType.LeftPlatform) return leftPlatform;
         if (currCenterCollision == CollisionType.RightPlatform) return rightPlatform;
+        if (currCenterCollision == CollisionType.PortalBlock) return currCenterTile;
         if (currCenterCollision == CollisionType.SolidPlatform) {
             if (CollisionTypes.platformOrSolid(currLeftTile) && CollisionTypes.platformOrSolid(currRightTile)) return centerSolid;
             if (CollisionTypes.platformOrSolid(currLeftTile)) return rightSolid;
@@ -109,6 +112,8 @@ class NormalTileset extends AutoTileset
             if (currDownLeftTile != CollisionType.Solid) return downLeftInnerTile;
             if (currDownRightTile != CollisionType.Solid) return downRightInnerTile;
         }
+
+        if (rand.nextInt(19.0) % 20 == 0) return this.centerTileVariation;
         return this.centerTile;
     }
 
@@ -124,6 +129,7 @@ class NormalTileset extends AutoTileset
         this.downLeftTile = collisionLayer.data[1][2].clone();
         this.downTile = collisionLayer.data[2][2].clone();
         this.downRightTile = collisionLayer.data[3][2].clone();
+        this.centerTileVariation = collisionLayer.data[5][1].clone();
 
         this.vertUpTile = collisionLayer.data[7][0].clone();
         this.vertCenterTile = collisionLayer.data[7][1].clone();

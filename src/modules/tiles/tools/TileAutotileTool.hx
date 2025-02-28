@@ -135,7 +135,7 @@ class TileAutotileTool extends TileTool
                 var autoTileset = getAutoTileset(autoTileLayer, row, col, autoTilerMap);
                 if (autoTileset == null) continue;
 
-                res[colOffset][rowOffset] = autoTileset.retile(section);
+                res[colOffset][rowOffset] = autoTileset.retile(section, random);
             }
         }
 
@@ -167,7 +167,7 @@ class TileAutotileTool extends TileTool
             for (colOffset in 0...rect.width.int()) {
                 var col:Int = colOffset + rect.x.int();
                 var section = getAutoTileSection(row, col);
-                res[colOffset][rowOffset] = autoTileset.retile(section);
+                res[colOffset][rowOffset] = autoTileset.retile(section, random);
             }
         }
 
