@@ -28,7 +28,6 @@ class TileLayerTemplate extends LayerTemplate
 	public var exportMode:Int = TileExportModes.IDS;
 	public var arrayMode:Int = ArrayExportModes.ONE;
 	public var defaultTileset:String = null;
-	public var isAutoTemplate:Bool;
 
 	override function createEditor(id:Int): LayerEditor
 	{
@@ -46,7 +45,6 @@ class TileLayerTemplate extends LayerTemplate
 
 		data.exportMode = exportMode;
 		data.arrayMode = arrayMode;
-		data.isAutoTemplate = isAutoTemplate;
 		if (defaultTileset != null) data.defaultTileset = defaultTileset;
 		else data.defaultTileset = "";
 
@@ -60,7 +58,6 @@ class TileLayerTemplate extends LayerTemplate
 		exportMode = Imports.integer(data.exportMode, TileExportModes.IDS);
 		arrayMode = Imports.integer(data.arrayMode, ArrayExportModes.ONE);
 		defaultTileset = data.defaultTileset;
-		isAutoTemplate = data.isAutoTemplate;
 
 		return this;
 	}

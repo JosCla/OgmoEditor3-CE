@@ -164,10 +164,6 @@ class TileLayer extends Layer
 	{
 		super(level, id);
 		this.initData();
-
-		if ((cast template:TileLayerTemplate).isAutoTemplate) {
-			EDITOR.setLayerVisibility(id, false);
-		}
 	}
 
 	function initData():Void
