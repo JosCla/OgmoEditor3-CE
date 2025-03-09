@@ -99,59 +99,16 @@ class TileAutotileTool extends TileTool
                 layer.data.length, layer.data[0].length
             );
 
-            if (OGMO.shift) {
-                if (layerEditor.brush.length == 0) return;
-                if (layerEditor.brush[0].length == 0) return;
-                var brushData:TileData = layerEditor.brush[0][0];
-                autoTileRectWithInd(rect, brushData.idx);
-            } else {
-                autoTileRect(rect);
-            }
+            autoTileRect(rect);
         }
     }
 
-    public function autoTileRect(rect:Rectangle)
+    public function autoTileRect(rect:Rectangle):Void
     {
-        // first getting the autotile layer
-        var autoTileLayer:TileLayer = null;
-        for (i in 0...layer.level.layers.length) {
-            var currLayer:Layer = layer.level.layers[i];
-            if (currLayer.template.name.toLowerCase() == "autotile" && Std.isOfType(currLayer, TileLayer)) {
-                autoTileLayer = cast currLayer;
-                break;
-            }
-        }
-        if (autoTileLayer == null) return;
-
-        // building autotile result
-        var res:Array<Array<TileData>> = [for (x in 0...rect.width.int()) [for (y in 0...rect.height.int()) layer.data[rect.x.int() + x][rect.y.int() + y]]];
-        var autoTilerMap:Map<Int, AutoTileset> = new Map<Int, AutoTileset>();
-        for (rowOffset in 0...rect.height.int()) {
-            var row:Int = rowOffset + rect.y.int();
-            for (colOffset in 0...rect.width.int()) {
-                var col:Int = colOffset + rect.x.int();
-
-                var section = getAutoTileSection(row, col);
-                var autoTileset = getAutoTileset(autoTileLayer, row, col, autoTilerMap);
-                if (autoTileset == null) continue;
-
-                res[colOffset][rowOffset] = autoTileset.retile(section, random);
-            }
-        }
-
-        // pasting autotile result
-		EDITOR.level.store("autotile");
-        for (rowOffset in 0...rect.height.int()) {
-            var row:Int = rowOffset + rect.y.int();
-            for (colOffset in 0...rect.width.int()) {
-                var col:Int = colOffset + rect.x.int();
-
-                layer.data[col][row].copy(res[colOffset][rowOffset]);
-            }
-        }
-
-        // (marking editor as dirty)
-        EDITOR.dirty();
+        if (layerEditor.brush.length == 0) return;
+        if (layerEditor.brush[0].length == 0) return;
+        var brushData:TileData = layerEditor.brush[0][0];
+        autoTileRectWithInd(rect, brushData.idx);
     }
 
     public function autoTileRectWithInd(rect:Rectangle, keyIdx:Int)
