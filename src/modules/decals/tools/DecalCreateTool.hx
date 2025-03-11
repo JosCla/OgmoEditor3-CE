@@ -14,10 +14,11 @@ class DecalCreateTool extends DecalTool
 	public var firstDelete:Bool = false;
 	public var lastDeletePos:Vector = new Vector();
     public var useTileGrid:Bool = false;
+	public var lastMouseDownPos:Vector = new Vector();
 
 	override public function drawOverlay()
 	{
-		if (layerEditor.brush != null && created == null && !deleting && canPreview)
+		if (layerEditor.brush != null && created == null && !deleting && canPreview && (!OGMO.shift))
 		{
 			EDITOR.overlay.drawTexture(previewAt.x, previewAt.y, layerEditor.brush, layerEditor.brush.center, scale);
 		}
@@ -27,6 +28,7 @@ class DecalCreateTool extends DecalTool
 	{
 		canPreview = false;
 		scale = new Vector(1, 1);
+		lastMouseDownPos = null;
 	}
 
 	override public function onMouseLeave()
@@ -42,6 +44,8 @@ class DecalCreateTool extends DecalTool
 		if (useTileGrid) Ogmo.editor.getTileLayer().snapToGrid(pos, pos); 
         else layer.snapToGrid(pos, pos); 
 
+		lastMouseDownPos = pos;
+
 		EDITOR.level.store("create decal");
 		EDITOR.locked = true;
 		EDITOR.dirty();
@@ -50,6 +54,8 @@ class DecalCreateTool extends DecalTool
 		var values = [for (template in (cast layerEditor.template:DecalLayerTemplate).values) new Value(template)];
 		created = new Decal(pos, path, layerEditor.brush, origin, scale, 0, values);
 		layer.decals.push(created);
+
+		resetCreatedPosition(pos);
 
 		if (OGMO.ctrl)
 			layerEditor.selected.push(created);
@@ -66,8 +72,8 @@ class DecalCreateTool extends DecalTool
 			created = null;
 			EDITOR.locked = false;
 
-			if (OGMO.shift)
-				EDITOR.toolBelt.setTool(0);
+			//if (OGMO.shift)
+			//	EDITOR.toolBelt.setTool(0);
 		}
 	}
 
@@ -113,14 +119,7 @@ class DecalCreateTool extends DecalTool
 	{
 		if (created != null)
 		{
-			if (useTileGrid) Ogmo.editor.getTileLayer().snapToGrid(pos, pos); 
-            else layer.snapToGrid(pos, pos); 
-
-			if (!pos.equals(created.position))
-			{
-				pos.clone(created.position);
-				EDITOR.dirty();
-			}
+			resetCreatedPosition(pos);
 		}
 		else if (deleting)
 		{
@@ -141,6 +140,44 @@ class DecalCreateTool extends DecalTool
                 previewAt = pos;
                 EDITOR.overlayDirty();
             }
+		}
+	}
+
+	private function resetCreatedPosition(pos:Vector)
+	{
+		if (useTileGrid) Ogmo.editor.getTileLayer().snapToGrid(pos, pos); 
+        else layer.snapToGrid(pos, pos); 
+
+		if (OGMO.shift)
+		{
+			var newPos:Vector = new Vector(
+				Math.min(pos.x.int(), lastMouseDownPos.x.int()),
+				Math.min(pos.y.int(), lastMouseDownPos.y.int())
+			);
+			var newScale:Vector = new Vector(
+				Math.abs(pos.x.int() - lastMouseDownPos.x.int()) / created.texture.width,
+				Math.abs(pos.y.int() - lastMouseDownPos.y.int()) / created.texture.height
+			);
+
+			newPos = newPos.add(new Vector(
+				created.texture.width * 0.5 * newScale.x,
+				created.texture.height * 0.5 * newScale.y
+			));
+
+			if (!newPos.equals(created.position) || !newScale.equals(scale))
+			{
+				newPos.clone(created.position);
+				newScale.clone(created.scale);
+				EDITOR.dirty();
+			}
+		}
+		else
+		{
+			if (!pos.equals(created.position))
+			{
+				pos.clone(created.position);
+				EDITOR.dirty();
+			}
 		}
 	}
 
@@ -177,6 +214,10 @@ class DecalCreateTool extends DecalTool
 			EDITOR.level.store("move decal to front");
 			for (decal in layerEditor.selected) moveDecalToFront(decal);
 			EDITOR.dirty();
+		}
+		else if (key == Keys.Shift)
+		{
+			EDITOR.overlayDirty();
 		}
 	}
 
