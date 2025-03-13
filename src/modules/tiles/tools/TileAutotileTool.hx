@@ -114,7 +114,7 @@ class TileAutotileTool extends TileTool
     public function autoTileRectWithInd(rect:Rectangle, keyIdx:Int)
     {
         // trying to build an autotiler from the provided index
-        var autoTileset:AutoTileset = EDITOR.getAutoTileset(keyIdx);
+        var autoTileset:AutoTileset = EDITOR.getAutoTileset(keyIdx, layer.template.name);
         if (autoTileset == null) return;
 
         // building autotile result
@@ -152,7 +152,7 @@ class TileAutotileTool extends TileTool
         if (autoTilerMap[keyIdx] != null) return autoTilerMap[keyIdx];
 
         // trying to recreate it if we haven't already
-        var newAutoTileset:AutoTileset = EDITOR.getAutoTileset(keyIdx);
+        var newAutoTileset:AutoTileset = EDITOR.getAutoTileset(keyIdx, layer.template.name);
         if (newAutoTileset != null) {
             autoTilerMap[keyIdx] = newAutoTileset;
         }

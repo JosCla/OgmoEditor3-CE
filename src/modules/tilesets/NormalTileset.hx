@@ -117,49 +117,49 @@ class NormalTileset extends AutoTileset
         return this.centerTile;
     }
 
-    override function parseTiles(collisionLayer:TileLayer):Void {
-        super.parseTiles(collisionLayer);
+    override function parseTiles(tileLayer:TileLayer):Void {
+        super.parseTiles(tileLayer);
 
-        this.upLeftTile = collisionLayer.data[1][0].clone();
-        this.upTile = collisionLayer.data[2][0].clone();
-        this.upRightTile = collisionLayer.data[3][0].clone();
-        this.leftTile = collisionLayer.data[1][1].clone();
-        this.centerTile = collisionLayer.data[2][1].clone();
-        this.rightTile = collisionLayer.data[3][1].clone();
-        this.downLeftTile = collisionLayer.data[1][2].clone();
-        this.downTile = collisionLayer.data[2][2].clone();
-        this.downRightTile = collisionLayer.data[3][2].clone();
-        this.centerTileVariation = collisionLayer.data[5][1].clone();
+        this.upLeftTile = tileLayer.data[1][0].clone();
+        this.upTile = tileLayer.data[2][0].clone();
+        this.upRightTile = tileLayer.data[3][0].clone();
+        this.leftTile = tileLayer.data[1][1].clone();
+        this.centerTile = tileLayer.data[2][1].clone();
+        this.rightTile = tileLayer.data[3][1].clone();
+        this.downLeftTile = tileLayer.data[1][2].clone();
+        this.downTile = tileLayer.data[2][2].clone();
+        this.downRightTile = tileLayer.data[3][2].clone();
+        this.centerTileVariation = tileLayer.data[5][1].clone();
 
-        this.vertUpTile = collisionLayer.data[7][0].clone();
-        this.vertCenterTile = collisionLayer.data[7][1].clone();
-        this.vertDownTile = collisionLayer.data[7][2].clone();
+        this.vertUpTile = tileLayer.data[7][0].clone();
+        this.vertCenterTile = tileLayer.data[7][1].clone();
+        this.vertDownTile = tileLayer.data[7][2].clone();
 
-        this.horizLeftTile = collisionLayer.data[1][3].clone();
-        this.horizCenterTile = collisionLayer.data[2][3].clone();
-        this.horizRightTile = collisionLayer.data[3][3].clone();
+        this.horizLeftTile = tileLayer.data[1][3].clone();
+        this.horizCenterTile = tileLayer.data[2][3].clone();
+        this.horizRightTile = tileLayer.data[3][3].clone();
 
-        this.leftSolid = collisionLayer.data[4][3].clone();
-        this.centerSolid = collisionLayer.data[5][3].clone();
-        this.rightSolid = collisionLayer.data[6][3].clone();
+        this.leftSolid = tileLayer.data[4][3].clone();
+        this.centerSolid = tileLayer.data[5][3].clone();
+        this.rightSolid = tileLayer.data[6][3].clone();
 
-        this.leftSemisolid = collisionLayer.data[7][3].clone();
-        this.centerSemisolid = collisionLayer.data[8][3].clone();
-        this.rightSemisolid = collisionLayer.data[9][3].clone();
+        this.leftSemisolid = tileLayer.data[7][3].clone();
+        this.centerSemisolid = tileLayer.data[8][3].clone();
+        this.rightSemisolid = tileLayer.data[9][3].clone();
 
-        this.upLeftInnerTile = collisionLayer.data[4][0].clone();
-        this.upRightInnerTile = collisionLayer.data[6][0].clone();
-        this.downLeftInnerTile = collisionLayer.data[4][2].clone();
-        this.downRightInnerTile = collisionLayer.data[6][2].clone();
+        this.upLeftInnerTile = tileLayer.data[4][0].clone();
+        this.upRightInnerTile = tileLayer.data[6][0].clone();
+        this.downLeftInnerTile = tileLayer.data[4][2].clone();
+        this.downRightInnerTile = tileLayer.data[6][2].clone();
 
-        this.spike = collisionLayer.data[9][1].clone();
-        this.leftSpike = collisionLayer.data[8][1].clone();
-        this.rightSpike = collisionLayer.data[10][1].clone();
-        this.downSpike = collisionLayer.data[9][2].clone();
+        this.spike = tileLayer.data[9][1].clone();
+        this.leftSpike = tileLayer.data[8][1].clone();
+        this.rightSpike = tileLayer.data[10][1].clone();
+        this.downSpike = tileLayer.data[9][2].clone();
 
-        this.leftNub = collisionLayer.data[1][4].clone();
-        this.rightNub = collisionLayer.data[2][4].clone();
-        this.leftPlatform = collisionLayer.data[3][4].clone();
-        this.rightPlatform = collisionLayer.data[4][4].clone();
+        this.leftNub = tileLayer.data[1][4].clone();
+        this.rightNub = tileLayer.data[2][4].clone();
+        this.leftPlatform = tileLayer.data[3][4].clone();
+        this.rightPlatform = tileLayer.data[4][4].clone();
     }
 }

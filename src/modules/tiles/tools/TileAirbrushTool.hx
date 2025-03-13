@@ -1,12 +1,16 @@
 package modules.tiles.tools;
 
 import modules.tiles.TileLayer.TileData;
+import modules.tilesets.AutoTileset;
+import util.Random;
 
 class TileAirbrushTool extends TileTool
 {
 	public var drawing:Bool = false;
     public var airbrushAdd:Array<Array<Float>> = null;
-	public var radius:Float = 5;
+	public var radius:Float = 4;
+
+    public var random:Random = new Random();
 
 	override public function drawOverlay()
 	{
@@ -15,7 +19,7 @@ class TileAirbrushTool extends TileTool
             var maxLevel:Float = 0;
             for (col in 0...airbrushAdd.length)
             {
-                for (row in 0...airbrushAdd.length)
+                for (row in 0...airbrushAdd[0].length)
                 {
                     if (airbrushAdd[col][row] > maxLevel) maxLevel = airbrushAdd[col][row];
                 }
@@ -25,7 +29,7 @@ class TileAirbrushTool extends TileTool
 
             for (col in 0...airbrushAdd.length)
             {
-                for (row in 0...airbrushAdd.length)
+                for (row in 0...airbrushAdd[0].length)
                 {
                     var at = layer.gridToLevel(new Vector(col, row));
 					var w = layer.template.gridSize.x;
@@ -45,8 +49,6 @@ class TileAirbrushTool extends TileTool
 
 	override public function onMouseDown(pos:Vector)
 	{
-		// layer.levelToGrid(pos, pos);
-
 		if (!drawing)
 		{
 			drawing = true;
@@ -71,8 +73,6 @@ class TileAirbrushTool extends TileTool
 
 	override public function onMouseMove(pos:Vector)
 	{
-		// layer.levelToGrid(pos, pos);
-
 		if (drawing)
 		{
             updateAirbrush(pos);
@@ -111,64 +111,33 @@ class TileAirbrushTool extends TileTool
 
     public function finishAirbrush()
     {
-        // TODO
 		EDITOR.level.store("airbrush");
+
+        if (layerEditor.brush.length == 0) return;
+        if (layerEditor.brush[0].length == 0) return;
+        var brushData:TileData = layerEditor.brush[0][0];
+        var autoTileset:AutoTileset = EDITOR.getAutoTileset(brushData.idx, layer.template.name);
+        if (autoTileset == null) return;
+
+        for (col in 0...airbrushAdd.length)
+        {
+            for (row in 0...airbrushAdd[0].length)
+            {
+				if (airbrushAdd[col][row] <= 0.001) continue;
+
+				var currTile:TileData = layer.data[col][row];
+				var radiusTile:TileData = new TileData(airbrushAdd[col][row].int());
+				var autotileInput:Array<Array<TileData>> = [
+					[radiusTile, currTile]
+				];
+
+				var res:TileData = autoTileset.retile(autotileInput, this.random);
+                this.layer.data[col][row].copy(res);
+            }
+        }
+
 		EDITOR.dirty();
     }
-
-    /*
-	public function doDraw()
-	{
-		if (anyChanges)
-		{
-			var random:Random = null;
-			if (OGMO.ctrl)
-				random = this.random;
-			EDITOR.level.store("line fill");
-
-			for (p in points)
-			{
-				if (layer.insideGrid(p)) layer.data[p.x.int()][p.y.int()].copy(brushAt(brush, start.x.int(), start.y.int(), end.x.int(), start.y.int(), p.x.int(), p.y.int(), random));
-			}
-		}
-	}
-
-	public function updateLine()
-	{
-		points = Calc.bresenham(start.x.int(), start.y.int(), end.x.int(), end.y.int());
-		EDITOR.overlayDirty();
-	}
-
-	public var anyChanges(get, never):Bool;
-	function get_anyChanges():Bool
-	{
-		var ret = false;
-
-		var random:Random = null;
-		if (OGMO.ctrl)
-		{
-			random = this.random;
-			random.pushState();
-		}
-
-		for (p in points)
-		{
-			if (layer.insideGrid(p))
-			{
-				if (!layer.data[p.x.int()][p.y.int()].equals(brushAt(brush, start.x.int(), start.y.int(), end.x.int(), start.y.int(), p.x.int(), p.y.int(), random)))
-				{
-					ret = true;
-					break;
-				}
-			}
-		}
-
-		if (random != null)
-			random.popState();
-
-		return ret;
-	}
-    */
 
 	override public function getName():String return "Airbrush";
 	override public function getIcon():String return "layers-clear";

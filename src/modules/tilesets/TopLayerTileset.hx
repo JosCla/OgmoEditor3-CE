@@ -19,9 +19,9 @@ class TopLayerTileset extends AutoTileset
         return this.centerTile;
     }
 
-    override function parseTiles(collisionLayer:TileLayer):Void {
-        super.parseTiles(collisionLayer);
-        this.upperTile = collisionLayer.data[1][0].clone();
-        this.centerTile = collisionLayer.data[1][1].clone();
+    override function parseTiles(tileLayer:TileLayer):Void {
+        super.parseTiles(tileLayer);
+        this.upperTile = tileLayer.data[1][0].clone();
+        this.centerTile = tileLayer.data[1][1].clone();
     }
 }

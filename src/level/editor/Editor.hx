@@ -24,6 +24,7 @@ import util.Keys;
 import level.data.Layer;
 import modules.tilesets.CollisionTypes;
 import modules.tilesets.TopLayerTileset;
+import modules.tilesets.AirbrushTileset;
 import modules.tilesets.AutoTileset;
 
 import js.node.child_process.ChildProcess as ChildProcessObject;
@@ -1111,8 +1112,10 @@ class Editor
 		}
 	}
 
-	public function getAutoTileset(keyIdx:Int):AutoTileset
+	public function getAutoTileset(keyIdx:Int, keyLayer:String):AutoTileset
 	{
+		keyLayer = keyLayer.toLowerCase();
+
 		var basePathRel:String = OGMO.project.autoTilesetDir;
 		if (basePathRel == null || basePathRel == '') return null;
 		var basePath:String = OGMO.project.getAbsoluteLevelPath(basePathRel);
@@ -1122,7 +1125,8 @@ class Editor
 
 		for (levelPath in levelPaths) {
 			var autoTileset:AutoTileset = getAutoTilesetFromPath(levelPath);
-			if (autoTileset != null && autoTileset.keyIndex == keyIdx) return autoTileset;
+			if (autoTileset != null && autoTileset.keyIndex == keyIdx && autoTileset.keyLayer == keyLayer)
+				return autoTileset;
 		}
 
 		return null;
@@ -1154,6 +1158,8 @@ class Editor
 		switch (tilesetType) {
 			case "normal":
 				return new NormalTileset(level);
+			case "airbrush":
+				return new AirbrushTileset(level);
 			default:
 				return new TopLayerTileset(level);
 		}

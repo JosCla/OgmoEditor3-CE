@@ -11,6 +11,7 @@ class AutoTileset
     public var level:Level;
 
     public var keyIndex:Int;
+    public var keyLayer:String;
 
     public function new(level:Level) {
         this.level = level;
@@ -18,16 +19,20 @@ class AutoTileset
         // parse out which tiles are where
         for (i in 0...this.level.layers.length) {
             var currLayer:Layer = this.level.layers[i];
-            if (currLayer.template.name.toLowerCase() == "collision" && Std.isOfType(currLayer, TileLayer)) {
-                this.parseTiles(cast (currLayer, TileLayer));
+            if (Std.isOfType(currLayer, TileLayer)) {
+                var tileLayer:TileLayer = cast currLayer;
+                if (tileLayer.data[0][0].idx > 0) {
+                    this.parseTiles(tileLayer);
+                }
             }
         }
     }
 
     public function retile(surroundingTiles: Array<Array<TileData>>, rand:Random):TileData {return new TileData();}
-    public function parseTiles(collisionLayer:TileLayer):Void
+    public function parseTiles(tileLayer:TileLayer):Void
     {
-        this.keyIndex = collisionLayer.data[0][0].idx;
+        this.keyIndex = tileLayer.data[0][0].idx;
+        this.keyLayer = tileLayer.template.name.toLowerCase();
     }
 }
 
