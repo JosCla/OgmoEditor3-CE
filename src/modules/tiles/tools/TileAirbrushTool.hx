@@ -10,6 +10,8 @@ class TileAirbrushTool extends TileTool
     public var airbrushAdd:Array<Array<Float>> = null;
 	public var radius:Float = 4;
 
+	public var lastMousePos:Vector = null;
+
     public var random:Random = new Random();
 
 	override public function drawOverlay()
@@ -35,10 +37,23 @@ class TileAirbrushTool extends TileTool
 					var w = layer.template.gridSize.x;
 					var h = layer.template.gridSize.y;
                     var addLevel = airbrushAdd[col][row];
-					EDITOR.overlay.drawRect(at.x, at.y, w, h, Color.white.x(addLevel * 1.0 / maxLevel));
+					EDITOR.overlay.drawRect(at.x, at.y, w, h, Color.white.x(addLevel * 0.7 / maxLevel));
                 }
             }
         }
+		else 
+		{
+			if (lastMousePos != null)
+			{
+				EDITOR.overlay.drawCircleAlt(
+					lastMousePos.x,
+					lastMousePos.y,
+					radius * layer.template.gridSize.x,
+					40,
+					Color.white.x(0.7)
+				);
+			}
+		}
 	}
 
 	override public function activated()
@@ -73,12 +88,24 @@ class TileAirbrushTool extends TileTool
 
 	override public function onMouseMove(pos:Vector)
 	{
+		lastMousePos = pos;
 		if (drawing)
 		{
             updateAirbrush(pos);
-            EDITOR.overlayDirty();
 		}
+        EDITOR.overlayDirty();
 	}
+
+	override public function onKeyPress(key:Int)
+	{
+		if (key == Keys.P) {
+			radius += 0.5;
+		} else if (key == Keys.O) {
+			radius -= 0.5;
+		}
+
+        EDITOR.overlayDirty();
+    }
 
     public function updateAirbrush(pos:Vector)
     {

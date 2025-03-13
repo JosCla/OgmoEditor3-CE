@@ -562,6 +562,22 @@ class GLRenderer
 		}
 	}
 
+	public function drawCircleAlt(x:Float, y:Float, radius:Float, segments:Int, col:Color):Void
+	{
+		var p:Array<Vector> = [new Vector(x + radius, y)];
+
+		for (i in 1...(segments + 1))
+		{
+			var rads = i * (Math.PI * 2) / segments;
+			var atX = x + Math.cos(rads) * radius;
+			var atY = y + Math.sin(rads) * radius;
+
+			p.push(new Vector(atX, atY));
+
+			drawLine(p[p.length - 2], p[p.length - 1], col);
+		}
+	}
+
 	public function drawGrid(gridSize: Vector, gridOffset: Vector, size: Vector, zoom: Float, col: Color): Void
 	{
 		setDrawMode(RenderingContext.LINES);
