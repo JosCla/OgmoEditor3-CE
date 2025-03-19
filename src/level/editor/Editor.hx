@@ -1,5 +1,9 @@
 package level.editor;
 
+import modules.entities.EntityLayer;
+import modules.entities.Entity;
+import rendering.Texture;
+import js.lib.Uint8Array;
 import modules.tilesets.NormalTileset;
 using StringTools;
 
@@ -637,31 +641,44 @@ class Editor
 		if (saveLevelAsImageRequested)
 		{
 			saveLevelAsImageRequested = false;
-			var camBackup = EDITOR.level.camera.clone();
-
-			draw.setAlpha(1);
-			draw.setupRenderTarget(level.data.size);
-
-			var i = level.layers.length - 1;
-			while(i >= 0) 
-			{
-				if (EDITOR.layerEditors[i] != null && EDITOR.layerEditors[i].visible) EDITOR.layerEditors[i].draw();
-				i--;
-			}
-
-			draw.finishDrawing();
-
-			var pixels = draw.getRenderTargetPixels();
+			var pixels = levelToData();
 			var path = FileSystem.chooseSaveFile("Level as image", [{ name: "Image", extensions: ["png"]}], level.displayNameNoExtension + ".png");
 			if (path.length > 0)
 				FileSystem.saveRGBAToPNG(pixels, Math.floor(level.data.size.x), Math.floor(level.data.size.y), path);
-
-			draw.doneRenderTarget();
-			draw.destroyRenderTarget();
-
-			EDITOR.level.camera = camBackup;
-			EDITOR.level.updateCameraInverse();
 		}
+	}
+
+	public function levelToData():Uint8Array
+	{
+		var camBackup = EDITOR.level.camera.clone();
+
+		draw.setAlpha(1);
+		draw.setupRenderTarget(level.data.size);
+
+		var i = level.layers.length - 1;
+		while(i >= 0) 
+		{
+			if (EDITOR.layerEditors[i] != null && EDITOR.layerEditors[i].visible) EDITOR.layerEditors[i].draw();
+			i--;
+		}
+
+		draw.finishDrawing();
+
+		var pixels = draw.getRenderTargetPixels();
+
+		draw.doneRenderTarget();
+		draw.destroyRenderTarget();
+
+		EDITOR.level.camera = camBackup;
+		EDITOR.level.updateCameraInverse();
+
+		return pixels;
+	}
+
+	public function levelToTexture():Texture
+	{
+		var pixels = levelToData();
+		return FileSystem.dataToTexture(pixels, Math.floor(level.data.size.x), Math.floor(level.data.size.y));
 	}
 
 	public function drawOverlay():Void
@@ -840,41 +857,46 @@ class Editor
 		}
 	}
 
-	public function doDirectionalLevel(direction:String):Void {
+	public function getLevelTransitions(level:Level):Array<Entity>
+	{
+		var res:Array<Entity> = [];
 
 		for (i in 0...level.layers.length) {
-			var layer:Dynamic = level.layers[i];
+			var layer:Layer = level.layers[i];
+            if (!Std.isOfType(layer, EntityLayer)) continue;
 
-			if (layer.entities != null) {
-				var entities:Dynamic = layer.entities;
+			var entityLayer:EntityLayer = cast layer;
+			var entities:Array<Entity> = entityLayer.entities.list;
 
-				for (j in 0...entities.list.length) {
-					var entity:Dynamic = entities.list[j];
+			for (j in 0...entities.length) {
+				var entity:Entity = entities[j];
 
-					if (entity.template.name == "transition" && entity.values[0].value == direction) {
-						
-						var path = entity.values[1].value;
-
-						var currentPath = level.path;
-						var k = currentPath.lastIndexOf('\\');
-						
-						var newPath = currentPath.substring(0, k) + "\\" + path.substring(1); 
-						newPath += ".json";
-
-						//trace(newPath);
-						//trace(EDITOR.levelManager.get(newerPath));
-						//trace(FileSystem.exists(newPath));
-
-
-						EDITOR.levelManager.open(newPath, (level) -> {trace("here99");}, (error) -> {trace(error);});
-						
-					}
+				if (entity.template.name == "transition") {
+					res.push(entity);
 				}
-
 			}
-
 		}
 
+		return res;
+	}
+
+	public function doDirectionalLevel(direction:String):Void {
+		var transitionEntities:Array<Entity> = getLevelTransitions(level);
+
+		for (entity in transitionEntities)
+		{
+			if (entity.values[0].value != direction) continue;
+
+			var path = entity.values[1].value;
+
+			var currentPath = level.path;
+			var k = currentPath.lastIndexOf('\\');
+
+			var newPath = currentPath.substring(0, k) + "\\" + path.substring(1);
+			newPath += ".json";
+
+			EDITOR.levelManager.open(newPath, (level) -> {trace("here99");}, (error) -> {trace(error);});
+		}
 	}
 
     public function getTileLayer():Layer {
@@ -1065,24 +1087,13 @@ class Editor
 			var newLevel = Imports.level(levelPath);
 			setLevel(newLevel);
 
-			draw.setAlpha(1);
-			draw.setupRenderTarget(level.data.size);
-
-			var i = level.layers.length - 1;
-			while(i >= 0) 
-			{
-				if (EDITOR.layerEditors[i] != null && EDITOR.layerEditors[i].visible) EDITOR.layerEditors[i].draw();
-				i--;
-			}
-
-			draw.finishDrawing();
+			var pixels = levelToData();
 
 			var path = levelPath;
 			path = levelPath.substring(path.indexOf('/') + 1, path.indexOf('.'));
 			path = path.substring(path.indexOf('\\') + 1);
 			path = dumpFolder + "/" + path.replace("/", "~") + ".png";
 
-			var pixels = draw.getRenderTargetPixels();
 			FileSystem.saveRGBAToPNG(pixels, Math.floor(level.data.size.x), Math.floor(level.data.size.y), path);
 
 			draw.doneRenderTarget();

@@ -1,5 +1,6 @@
 package io;
 
+import rendering.Texture;
 import js.node.fs.Stats;
 import js.jquery.JQuery;
 import haxe.Json;
@@ -146,6 +147,31 @@ class FileSystem
 		Fs.writeFileSync(path, img.toPNG());
 
 		canvas.remove();
+	}
+
+	public static function dataToTexture(data:Uint8Array, width:Int, height:Int)
+	{
+		// using a canvas to get the data into a URL string
+		var canvas = Browser.document.createCanvasElement();
+		canvas.width = width;
+		canvas.height = height;
+
+		var ctx = canvas.getContext("2d");
+		var imageData:ImageData = ctx.createImageData(Math.ffloor(width), Math.ffloor(height));
+		for (i in 0...imageData.data.length)
+			imageData.data[i] = data[i];
+		ctx.putImageData(imageData, 0, 0);
+
+		var dataURL:String = canvas.toDataURL("image/png");
+
+		canvas.remove();
+
+		// creating an ImageElement, and putting it in a Texture
+		var image:ImageElement = Browser.document.createImageElement();
+		image.src = dataURL;
+
+		var tex:Texture = new Texture(image);
+		return tex;
 	}
 
 	/*
