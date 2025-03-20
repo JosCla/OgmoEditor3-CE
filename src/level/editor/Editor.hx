@@ -1,5 +1,6 @@
 package level.editor;
 
+import level.editor.ui.AdjacentLevel;
 import modules.entities.EntityLayer;
 import modules.entities.Entity;
 import rendering.Texture;
@@ -880,23 +881,59 @@ class Editor
 		return res;
 	}
 
-	public function doDirectionalLevel(direction:String):Void {
+	public function transitionEntityToLevelPath(transitionEntity:Entity):String
+	{
+		var path = transitionEntity.values[1].value;
+
+		var currentPath = level.path;
+		var k = currentPath.lastIndexOf('\\');
+
+		var newPath = currentPath.substring(0, k) + "\\" + path.substring(1);
+		newPath += ".json";
+
+		return newPath;
+	}
+
+	public function doDirectionalLevel(direction:String):Void
+	{
 		var transitionEntities:Array<Entity> = getLevelTransitions(level);
 
 		for (entity in transitionEntities)
 		{
 			if (entity.values[0].value != direction) continue;
 
-			var path = entity.values[1].value;
-
-			var currentPath = level.path;
-			var k = currentPath.lastIndexOf('\\');
-
-			var newPath = currentPath.substring(0, k) + "\\" + path.substring(1);
-			newPath += ".json";
-
+			var newPath:String = transitionEntityToLevelPath(entity);
 			EDITOR.levelManager.open(newPath, (level) -> {trace("here99");}, (error) -> {trace(error);});
 		}
+	}
+
+	public function getOppositeDirection(direction:String):String
+	{
+		switch (direction.toLowerCase()) {
+			case "up": return "down";
+			case "down": return "up";
+			case "left": return "right";
+			case "right": return "left";
+		}
+
+		return "up";
+	}
+
+	public function getAdjacentLevelTextures(level:Level):Array<AdjacentLevel>
+	{
+		var transitionEntities:Array<Entity> = getLevelTransitions(level);
+		var adjLevels:Array<AdjacentLevel> = [];
+
+		for (entity in transitionEntities)
+		{
+			// opening new level, getting its transition entities
+			var newPath:String = transitionEntityToLevelPath(entity);
+			var newLevel:Level = EDITOR.levelManager.openWithoutSetLevel(newPath);
+			if (newLevel == null) continue;
+			var newTransitionEntities:Array<Entity> = getLevelTransitions(newLevel);
+		}
+
+		return adjLevels;
 	}
 
     public function getTileLayer():Layer {
