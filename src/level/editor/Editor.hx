@@ -58,6 +58,7 @@ class Editor
 	public var propertyDisplayDropdown: PropertyDisplayDropdown;
 	public var collisionTypes:CollisionTypes;
 	public var adjLevels:Array<AdjacentLevel> = null;
+	public var renderAdjacent:Bool = true;
 
 	var lastArrows: Vector = new Vector();
 	var mouseMoving:Bool = false;
@@ -601,7 +602,7 @@ class Editor
 		draw.drawRect(0, 0, level.data.size.x, level.data.size.y, level.project.backgroundColor);
 
 		//Adjacent Levels
-		if (adjLevels != null)
+		if (adjLevels != null && renderAdjacent)
 		{
 			draw.setAlpha(0.4);
 
@@ -880,6 +881,9 @@ class Editor
 				if (OGMO.ctrl && EDITOR.level != null) doDirectionalLevel("Left");
 			case Keys.Right:
 				if (OGMO.ctrl && EDITOR.level != null) doDirectionalLevel("Right");
+			case Keys.L:
+				renderAdjacent = !renderAdjacent;
+				dirty();
 		}
 	}
 
