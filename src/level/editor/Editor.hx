@@ -973,7 +973,7 @@ class Editor
 			for (newEntity in newTransitionEntities)
 			{
 				var returnPath:String = transitionEntityToLevelPath(newEntity);
-				if (returnPath != level.path) continue;
+				if (returnPath != level.path.replace('\\', '/')) continue;
 
 				connectedTransition = newEntity;
 				break;
