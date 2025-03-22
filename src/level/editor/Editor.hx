@@ -57,6 +57,7 @@ class Editor
 	public var currentLayerEditor(get, null):LayerEditor;
 	public var propertyDisplayDropdown: PropertyDisplayDropdown;
 	public var collisionTypes:CollisionTypes;
+	public var adjLevels:Array<AdjacentLevel> = null;
 
 	var lastArrows: Vector = new Vector();
 	var mouseMoving:Bool = false;
@@ -599,6 +600,23 @@ class Editor
 		draw.drawRect(-1, -1, level.data.size.x + 2, level.data.size.y + 2, Color.black);
 		draw.drawRect(0, 0, level.data.size.x, level.data.size.y, level.project.backgroundColor);
 
+		//Adjacent Levels
+		if (adjLevels != null)
+		{
+			draw.setAlpha(0.4);
+
+			for (adjLevel in adjLevels)
+			{
+				draw.drawTexture(
+					adjLevel.pos.x,
+					adjLevel.pos.y,
+					adjLevel.tex
+				);
+			}
+
+			draw.setAlpha(1);
+		}
+
 		//Draw the layers below and including the current one
 		var i = level.layers.length - 1;
 		while(i > level.currentLayerID) 
@@ -642,16 +660,21 @@ class Editor
 		if (saveLevelAsImageRequested)
 		{
 			saveLevelAsImageRequested = false;
-			var pixels = levelToData();
+			var pixels = levelToData(level);
 			var path = FileSystem.chooseSaveFile("Level as image", [{ name: "Image", extensions: ["png"]}], level.displayNameNoExtension + ".png");
 			if (path.length > 0)
 				FileSystem.saveRGBAToPNG(pixels, Math.floor(level.data.size.x), Math.floor(level.data.size.y), path);
 		}
 	}
 
-	public function levelToData():Uint8Array
+	public function levelToData(level:Level):Uint8Array
 	{
+		var originalLevel:Level = this.level;
+		var shouldChangeLevel:Bool = (level.path != originalLevel.path);
 		var camBackup = EDITOR.level.camera.clone();
+
+		if (shouldChangeLevel)
+			setLevel(level);
 
 		draw.setAlpha(1);
 		draw.setupRenderTarget(level.data.size);
@@ -670,15 +693,17 @@ class Editor
 		draw.doneRenderTarget();
 		draw.destroyRenderTarget();
 
+		if (shouldChangeLevel)
+			setLevel(originalLevel);
 		EDITOR.level.camera = camBackup;
 		EDITOR.level.updateCameraInverse();
 
 		return pixels;
 	}
 
-	public function levelToTexture():Texture
+	public function levelToTexture(level:Level):Texture
 	{
-		var pixels = levelToData();
+		var pixels = levelToData(level);
 		return FileSystem.dataToTexture(pixels, Math.floor(level.data.size.x), Math.floor(level.data.size.y));
 	}
 
@@ -885,10 +910,10 @@ class Editor
 	{
 		var path = transitionEntity.values[1].value;
 
-		var currentPath = level.path;
-		var k = currentPath.lastIndexOf('\\');
+		var currentPath = level.path.replace('\\', '/');
+		var k = currentPath.lastIndexOf('/');
 
-		var newPath = currentPath.substring(0, k) + "\\" + path.substring(1);
+		var newPath = currentPath.substring(0, k) + "/" + path.substring(1);
 		newPath += ".json";
 
 		return newPath;
@@ -919,6 +944,18 @@ class Editor
 		return "up";
 	}
 
+	public function getDirectionOffset(direction:String):Vector
+	{
+		switch (direction.toLowerCase()) {
+			case "up": return new Vector(0, -12);
+			case "down": return new Vector(0, 12);
+			case "left": return new Vector(-12, 0);
+			case "right": return new Vector(12, 0);
+		}
+
+		return new Vector(0, 0);
+	}
+
 	public function getAdjacentLevelTextures(level:Level):Array<AdjacentLevel>
 	{
 		var transitionEntities:Array<Entity> = getLevelTransitions(level);
@@ -926,14 +963,39 @@ class Editor
 
 		for (entity in transitionEntities)
 		{
-			// opening new level, getting its transition entities
+			// opening new level, finding its transition entity that connects back to this level
 			var newPath:String = transitionEntityToLevelPath(entity);
 			var newLevel:Level = EDITOR.levelManager.openWithoutSetLevel(newPath);
 			if (newLevel == null) continue;
 			var newTransitionEntities:Array<Entity> = getLevelTransitions(newLevel);
+
+			var connectedTransition:Entity = null;
+			for (newEntity in newTransitionEntities)
+			{
+				var returnPath:String = transitionEntityToLevelPath(newEntity);
+				if (returnPath != level.path) continue;
+
+				connectedTransition = newEntity;
+				break;
+			}
+
+			if (connectedTransition == null) continue;
+
+			// at this point, we know the new level successfully connects back to the input level!
+			var newLevelTexture:Texture = levelToTexture(newLevel);
+
+			var actualNewTransitionPos:Vector = connectedTransition.position;
+			var desiredNewTransitionPos:Vector = entity.position.clone().add(getDirectionOffset(entity.values[0].value).clone());
+			var drawPos = desiredNewTransitionPos.clone().sub(actualNewTransitionPos.clone());
+
+			adjLevels.push(new AdjacentLevel(newLevelTexture, drawPos));
 		}
 
 		return adjLevels;
+	}
+
+	public function resetAdjLevels() {
+		this.adjLevels = getAdjacentLevelTextures(level);
 	}
 
     public function getTileLayer():Layer {
@@ -1124,7 +1186,7 @@ class Editor
 			var newLevel = Imports.level(levelPath);
 			setLevel(newLevel);
 
-			var pixels = levelToData();
+			var pixels = levelToData(newLevel);
 
 			var path = levelPath;
 			path = levelPath.substring(path.indexOf('/') + 1, path.indexOf('.'));

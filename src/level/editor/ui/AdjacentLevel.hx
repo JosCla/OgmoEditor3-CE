@@ -4,10 +4,10 @@ import rendering.Texture;
 
 class AdjacentLevel
 {
-    var tex:Texture;
-    var pos:Vector;
+    public var tex:Texture;
+    public var pos:Vector;
 
-    function new(tex:Texture, pos:Vector)
+    public function new(tex:Texture, pos:Vector)
     {
         this.tex = tex;
         this.pos = pos;

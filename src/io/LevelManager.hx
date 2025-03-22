@@ -55,6 +55,8 @@ class LevelManager
 			if (level.externallyModified)
 				this.resolveModifiedLevel();
 
+			EDITOR.resetAdjLevels();
+
 			return;
 		}
 
@@ -85,6 +87,8 @@ class LevelManager
 
 			if (onSuccess != null)
 				onSuccess(level);
+
+			EDITOR.resetAdjLevels();
 		});
 	}
 
