@@ -1,5 +1,6 @@
 package io;
 
+import js.Browser;
 import electron.Shell;
 import util.Popup;
 import js.node.Fs;
@@ -56,6 +57,7 @@ class LevelManager
 				this.resolveModifiedLevel();
 
 			EDITOR.resetAdjLevels();
+			Browser.window.setTimeout(EDITOR.dirty, 30);
 
 			return;
 		}
@@ -89,6 +91,7 @@ class LevelManager
 				onSuccess(level);
 
 			EDITOR.resetAdjLevels();
+			Browser.window.setTimeout(EDITOR.dirty, 0);
 		});
 	}
 
