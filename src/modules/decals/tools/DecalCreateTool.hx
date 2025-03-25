@@ -163,6 +163,7 @@ class DecalCreateTool extends DecalTool
 				created.texture.width * 0.5 * newScale.x,
 				created.texture.height * 0.5 * newScale.y
 			));
+			newPos = new Vector(Math.floor(newPos.x), Math.floor(newPos.y));
 
 			if (!newPos.equals(created.position) || !newScale.equals(scale))
 			{
