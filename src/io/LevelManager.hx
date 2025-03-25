@@ -97,8 +97,6 @@ class LevelManager
 
 	public function openWithoutSetLevel(path:String):Level
 	{
-		this.trim();
-
 		//Check if the level is already open
 		var level = this.get(path);
 		if (level != null)
