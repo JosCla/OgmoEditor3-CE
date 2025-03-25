@@ -608,6 +608,13 @@ class Editor
 
 			for (adjLevel in adjLevels)
 			{
+				draw.drawRectLines(
+					adjLevel.pos.x,
+					adjLevel.pos.y,
+					adjLevel.tex.width,
+					adjLevel.tex.height,
+					Color.white
+				);
 				draw.drawTexture(
 					adjLevel.pos.x,
 					adjLevel.pos.y,
