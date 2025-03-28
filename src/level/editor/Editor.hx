@@ -940,6 +940,7 @@ class Editor
 
 			var newPath:String = transitionEntityToLevelPath(entity);
 			EDITOR.levelManager.open(newPath, (level) -> {trace("here99");}, (error) -> {trace(error);});
+			levelsPanel.scrollToLevel(newPath);
 		}
 	}
 

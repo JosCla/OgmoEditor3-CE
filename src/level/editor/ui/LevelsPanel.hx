@@ -328,6 +328,27 @@ class LevelsPanel extends SidePanel
 		});
 	}
 
+	public function scrollToLevel(path:String):Void
+	{
+		var desiredNode:ItemListItem = null;
+		itemlist.perform(function (node)
+		{
+			if (Std.is(node,ItemListItem))
+			{
+				var currPath = node.data;
+				if (path == currPath)
+				{
+					desiredNode = cast node;
+					return;
+				}
+			}
+		});
+
+		if (desiredNode == null) return;
+
+		levels.scrollTop(desiredNode.element.position().top);
+	}
+
 	function recursiveFolderExpandCheck(node: ItemListNode):Void
 	{
 			for (i in 0...node.children.length)
