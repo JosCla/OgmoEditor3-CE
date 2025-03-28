@@ -11,6 +11,8 @@ import util.Chokidar;
 import util.RightClickMenu;
 import util.Popup;
 
+using StringTools;
+
 typedef PanelItem =
 {
 	path:String,
@@ -330,12 +332,13 @@ class LevelsPanel extends SidePanel
 
 	public function scrollToLevel(path:String):Void
 	{
+		path = path.replace("\\", "/");
 		var desiredNode:ItemListItem = null;
 		itemlist.perform(function (node)
 		{
 			if (Std.is(node,ItemListItem))
 			{
-				var currPath = node.data;
+				var currPath = node.data.replace("\\", "/");
 				if (path == currPath)
 				{
 					desiredNode = cast node;
