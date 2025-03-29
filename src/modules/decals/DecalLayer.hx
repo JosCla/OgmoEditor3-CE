@@ -38,7 +38,7 @@ class DecalLayer extends Layer
 
 			var values = Imports.values(decal, (cast template:DecalLayerTemplate).values);
 
-			trace(path + ", " + relative);
+			// trace(path + ", " + relative);
 
 			for (tex in (cast template : DecalLayerTemplate).textures)
 				if (tex.path == relative)
