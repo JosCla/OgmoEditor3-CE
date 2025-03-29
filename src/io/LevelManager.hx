@@ -7,6 +7,7 @@ import js.node.Fs;
 import js.node.Path;
 import js.html.Exception;
 import level.data.Level;
+using StringTools;
 
 class LevelManager
 {
@@ -168,7 +169,7 @@ class LevelManager
 	public function get(path:String): Level
 	{
 		for (level in levels)
-			if (level.managerPath == path)
+			if (level.managerPath.replace("\\", "/") == path.replace("\\", "/"))
 				return level;
 
 		return null;
