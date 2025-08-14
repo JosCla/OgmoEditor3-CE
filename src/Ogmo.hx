@@ -46,6 +46,7 @@ class Ogmo
 	public var shift(get, null):Bool;
 	public var alt(get, null):Bool;
     public var tab(get, null):Bool;
+	public var space(get, null):Bool;
 	public var inputFocused(get, null):Bool;
 	
 	public static function main() {
@@ -93,8 +94,8 @@ class Ogmo
 
 			switch (e.which)
 			{
-				case Keys.Space:
-					if (e.target == Browser.document.body) e.preventDefault();
+				//case Keys.Space:
+				//	if (e.target == Browser.document.body) e.preventDefault();
 				case Keys.Z:
 				case Keys.Y:
 					if (ogmo.ctrl) e.preventDefault();
@@ -320,6 +321,11 @@ class Ogmo
     {
         return keyCheckMap[Keys.Tab];
     }
+
+	function get_space():Bool
+	{
+		return keyCheckMap[Keys.Space];
+	}
 
 	function get_inputFocused():Bool
 	{

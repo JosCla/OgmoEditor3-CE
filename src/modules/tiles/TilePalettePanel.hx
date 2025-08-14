@@ -143,7 +143,7 @@ class TilePalettePanel extends SidePanel
 
 	public function mouseDown(e:Event):Void
 	{
-		if (OGMO.keyCheckMap[Keys.Space] || e.which == Keys.MouseMiddle)
+		if (false || e.which == Keys.MouseMiddle) // OGMO.keyCheckMap[Keys.Space]
 		{
 			draggingActive = true;
 			draggingOrigin = getMouse(e);

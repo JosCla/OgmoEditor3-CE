@@ -92,7 +92,7 @@ class TileAutotileTool extends TileTool
     
     override public function onKeyPress(key:Int)
     {
-        if (key == Keys.Space)
+        if (key == Keys.P)
         {
             var rect:Rectangle = new Rectangle(
                 0, 0,

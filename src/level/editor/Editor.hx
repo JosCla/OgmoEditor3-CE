@@ -119,7 +119,7 @@ class Editor
 			{
 				if (EDITOR.level != null)
 				{
-					if ((OGMO.keyCheckMap[Keys.Space] && e.which == Keys.MouseLeft) || e.which == Keys.MouseMiddle)
+					if ((false && e.which == Keys.MouseLeft) || e.which == Keys.MouseMiddle) // OGMO.keyCheckMap[Keys.Space]
 					{
 						EDITOR.middleClickMove = true;
 						EDITOR.mouseMoving = true;
@@ -814,16 +814,16 @@ class Editor
 		{
 			default:
 				defaultKeyPress(key);
-			case Keys.Space:
+			//case Keys.Space:
 				//Center Camera
-				if (OGMO.ctrl && EDITOR.level != null)
-				{
-					EDITOR.level.centerCamera();
-				}
-				else
-				{
-					defaultKeyPress(key);
-				}
+			//	if (OGMO.ctrl && EDITOR.level != null)
+			//	{
+			//		EDITOR.level.centerCamera();
+			//	}
+			//	else
+			//	{
+			//		defaultKeyPress(key);
+			//	}
 			case Keys.G:
 				//Toggle Grid
 				if (OGMO.ctrl && EDITOR.level != null)
@@ -846,12 +846,17 @@ class Editor
 					if (OGMO.shift) EDITOR.level.doSaveAs();
 					else EDITOR.level.doSave();
 				}
+				if (OGMO.space) EDITOR.setLayer((level.currentLayerID + 1) % OGMO.project.layers.length);
 			case Keys.N:
 				//New Level
 				if (OGMO.ctrl && !EDITOR.locked) EDITOR.levelManager.create();
 			case Keys.W:
 				//Close Level
 				if (OGMO.ctrl && EDITOR.level != null && !EDITOR.locked) EDITOR.levelManager.close(EDITOR.level);
+				if (OGMO.space) {
+					if (level.currentLayerID == 0) EDITOR.setLayer(OGMO.project.layers.length - 1);
+					else EDITOR.setLayer((level.currentLayerID - 1) % OGMO.project.layers.length);
+				}
 			case Keys.D1:
 				dPress(key);
 			case Keys.D2:
@@ -939,7 +944,7 @@ class Editor
 			if (entity.values[0].value != direction) continue;
 
 			var newPath:String = transitionEntityToLevelPath(entity);
-			EDITOR.levelManager.open(newPath, (level) -> {trace("here99");}, (error) -> {trace(error);});
+			EDITOR.levelManager.open(newPath, (level) -> {}, (error) -> {trace(error);});
 			levelsPanel.scrollToLevel(newPath);
 		}
 	}
@@ -1047,8 +1052,8 @@ class Editor
 		{
 			default:
 				defaultKeyRelease(key);
-			case Keys.Space:
-				mouseMoving = false;
+			//case Keys.Space:
+			//	mouseMoving = false;
 			case Keys.Shift:
 				unset(key);
 			case Keys.Ctrl:
@@ -1123,10 +1128,10 @@ class Editor
 
 		//Up and Down
 		{
-			var up = OGMO.keyCheckMap[Keys.Up];
-			var down = OGMO.keyCheckMap[Keys.Down];
-			var upP = OGMO.keyPressMap[Keys.Up];
-			var downP = OGMO.keyPressMap[Keys.Down];
+			var up = OGMO.keyCheckMap[Keys.Up] && !OGMO.space;
+			var down = OGMO.keyCheckMap[Keys.Down] && !OGMO.space;
+			var upP = OGMO.keyPressMap[Keys.Up] && !OGMO.space;
+			var downP = OGMO.keyPressMap[Keys.Down] && !OGMO.space;
 
 			if (lastArrows.y > 0)
 			{

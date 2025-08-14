@@ -89,13 +89,13 @@ class TileLayerEditor extends LayerEditor
 		switch (key) // WASD
 		{
 			case Keys.W:
-				moveBrush(0, -1);
+				if (!OGMO.space) moveBrush(0, -1);
 			case Keys.A:
-				moveBrush(-1, 0);
+				if (!OGMO.space) moveBrush(-1, 0);
 			case Keys.D:
-				moveBrush(1, 0);
+				if (!OGMO.space) moveBrush(1, 0);
 			case Keys.S:
-				moveBrush(0, 1);
+				if (!OGMO.space) moveBrush(0, 1);
 		}
 	}
 
