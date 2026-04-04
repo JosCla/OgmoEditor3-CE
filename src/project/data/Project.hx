@@ -25,6 +25,7 @@ class Project
 	public var directoryDepth:Int = 5;
 	public var layerGridDefaultSize = new Vector(8, 8);
 	public var autoTilesetDir:String;
+	public var mapDotsDir:String;
 
 	public var levelDefaultSize:Vector = new Vector(320, 240);
 	public var levelMinSize:Vector = new Vector(128, 128);
@@ -155,6 +156,7 @@ class Project
 		compactExport = data.compactExport;
 		externalScript = data.externalScript;
 		autoTilesetDir = data.autoTilesetDir;
+		mapDotsDir = data.mapDotsDir;
 		playCommand = data.playCommand;
 
 		// tilesets
@@ -205,6 +207,7 @@ class Project
 			compactExport: compactExport,
 			externalScript: externalScript,
 			autoTilesetDir: autoTilesetDir,
+			mapDotsDir: mapDotsDir,
 			playCommand: playCommand,
 			entityTags: entities.tags,
 			layers: [for (layer in layers) layer.save()],
@@ -252,6 +255,7 @@ typedef ProjectSaveFile =
 	compactExport:Bool,
 	externalScript:String,
 	autoTilesetDir:String,
+	mapDotsDir:String,
 	playCommand:String,
 	entityTags:Array<String>,
 	layers:Array<Dynamic>,

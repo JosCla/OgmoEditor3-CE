@@ -1,5 +1,6 @@
 package modules.entities;
 
+import haxe.io.Path;
 import io.Imports;
 import level.data.Value;
 import project.data.value.TextValueTemplate;
@@ -36,6 +37,9 @@ class Entity
 	private var _texture:Null<Texture>;
 	private static var hoverColor:Color = new Color(1, 1, 1, 0.5);
 
+	// Threadbound
+	private var _dotsTexture:Null<Texture>;
+
 	public static function create(id:Int, template:EntityTemplate, pos:Vector):Entity
 	{
 		var e = new Entity();
@@ -53,6 +57,16 @@ class Entity
 		e._texture = template.texture;
 		e.values = [];
 		for (value in template.values) e.values.push(new Value(value));
+
+		// Threadbound: load dots texture if PortedMapSettings
+		Popup.open("hi", "entity", template.name, ["wow"]);
+		if (template.name == "PortedMapSettings")
+		{
+			var fullDotsPathArr:Array<String> = [OGMO.project.mapDotsDir,"station_20_104_20260404_1157124491.png"];
+			var fullDotsPath:String = Path.join(fullDotsPathArr);
+			Popup.open("hi", "entity", fullDotsPath, ["wow"]);
+			e._dotsTexture = Texture.fromFile(fullDotsPath);
+		}
 
 		e.updateMatrix();
 		return e;
@@ -77,6 +91,15 @@ class Entity
 		e.values = Imports.values(data, template.values);
 
 		e._texture = template.texture;
+
+		if (template.name == "PortedMapSettings")
+		{
+			var baseDir:String = OGMO.project.getAbsoluteLevelPath(OGMO.project.mapDotsDir);
+			var fullDotsPathArr:Array<String> = [baseDir,"station_20_104_20260404_1157124491.png"];
+			var fullDotsPath:String = Path.join(fullDotsPathArr);
+			// Popup.open("hi", "entity", fullDotsPath, ["wow"]);
+			e._dotsTexture = Texture.fromFile(fullDotsPath);
+		}
 
 		e.updateMatrix();
 		return e;
@@ -119,6 +142,7 @@ class Entity
 		e.color = color;
 		e.nodes = [for (node in nodes) node.clone()];
 		e._texture = _texture;
+		e._dotsTexture = _dotsTexture;
 		e.values = [for (value in values) value.clone()];
 
 		e.updateMatrix();
@@ -271,6 +295,14 @@ class Entity
 					EDITOR.draw.drawTris(_points, node, c);
 				}
 			}
+		}
+
+		// Threadbound: If this is a PortedMapSettings, draw associated dot map
+		if (_dotsTexture != null)
+		{
+			var dotsX = position.x + (size.x * 0.5) - (20 * 0.5);
+			var dotsY = position.y + (size.y * 0.5) - (104 * 0.5);
+			EDITOR.draw.drawTexture(dotsX, dotsY, _dotsTexture, null, new Vector(0.5, 0.5), 0);
 		}
 	}
 
