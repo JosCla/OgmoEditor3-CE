@@ -1,5 +1,6 @@
 package modules.entities;
 
+import haxe.ds.ArraySort;
 import haxe.io.Path;
 import io.Imports;
 import level.data.Value;
@@ -39,6 +40,9 @@ class Entity
 
 	// Threadbound
 	private var _dotsTexture:Null<Texture>;
+	private var _dotsOffsetX:Int;
+	private var _dotsOffsetY:Int;
+	private var _lastDotsArea:String = "";
 
 	public static function create(id:Int, template:EntityTemplate, pos:Vector):Entity
 	{
@@ -57,16 +61,6 @@ class Entity
 		e._texture = template.texture;
 		e.values = [];
 		for (value in template.values) e.values.push(new Value(value));
-
-		// Threadbound: load dots texture if PortedMapSettings
-		Popup.open("hi", "entity", template.name, ["wow"]);
-		if (template.name == "PortedMapSettings")
-		{
-			var fullDotsPathArr:Array<String> = [OGMO.project.mapDotsDir,"station_20_104_20260404_1157124491.png"];
-			var fullDotsPath:String = Path.join(fullDotsPathArr);
-			Popup.open("hi", "entity", fullDotsPath, ["wow"]);
-			e._dotsTexture = Texture.fromFile(fullDotsPath);
-		}
 
 		e.updateMatrix();
 		return e;
@@ -91,15 +85,6 @@ class Entity
 		e.values = Imports.values(data, template.values);
 
 		e._texture = template.texture;
-
-		if (template.name == "PortedMapSettings")
-		{
-			var baseDir:String = OGMO.project.getAbsoluteLevelPath(OGMO.project.mapDotsDir);
-			var fullDotsPathArr:Array<String> = [baseDir,"station_20_104_20260404_1157124491.png"];
-			var fullDotsPath:String = Path.join(fullDotsPathArr);
-			// Popup.open("hi", "entity", fullDotsPath, ["wow"]);
-			e._dotsTexture = Texture.fromFile(fullDotsPath);
-		}
 
 		e.updateMatrix();
 		return e;
@@ -142,7 +127,6 @@ class Entity
 		e.color = color;
 		e.nodes = [for (node in nodes) node.clone()];
 		e._texture = _texture;
-		e._dotsTexture = _dotsTexture;
 		e.values = [for (value in values) value.clone()];
 
 		e.updateMatrix();
@@ -298,11 +282,20 @@ class Entity
 		}
 
 		// Threadbound: If this is a PortedMapSettings, draw associated dot map
-		if (_dotsTexture != null)
+		if (template.name == "PortedMapSettings")
 		{
-			var dotsX = position.x + (size.x * 0.5) - (20 * 0.5);
-			var dotsY = position.y + (size.y * 0.5) - (104 * 0.5);
-			EDITOR.draw.drawTexture(dotsX, dotsY, _dotsTexture, null, new Vector(0.5, 0.5), 0);
+			var newDotsArea:String = getMapDotsArea();
+			if (newDotsArea != _lastDotsArea)
+			{
+				loadMapDots(newDotsArea);
+			}
+
+			if (_dotsTexture != null)
+			{
+				var dotsX = position.x + (size.x * 0.5) - (_dotsOffsetX * 0.5);
+				var dotsY = position.y + (size.y * 0.5) - (_dotsOffsetY * 0.5);
+				EDITOR.draw.drawTexture(dotsX, dotsY, _dotsTexture, null, new Vector(0.5, 0.5), 0);
+			}
 		}
 	}
 
@@ -332,6 +325,61 @@ class Entity
 		EDITOR.overlay.drawLine(corners[1], corners[3], Color.green);
 		EDITOR.overlay.drawLine(corners[2], corners[3], Color.green);
 		EDITOR.overlay.drawLine(corners[2], corners[0], Color.green);
+	}
+
+	/*
+		THREADBOUND
+	*/
+
+	public function getMapDotsArea()
+	{
+		var areaName:String = "";
+		for (v in this.values)
+		{
+			if (v.template.name=="areaName")
+			{
+				areaName = v.value;
+			}
+		}
+		
+		return areaName;
+	}
+
+	public static var areaMap:Map<String, String> = [
+		"Station" => "station"
+		, "Rooftops" => "rooftops"
+		, "Suspended Laboratory" => "sus_lab"
+		, "Forest" => "forest"
+		, "Factory" => "factory"
+		, "Cliffs" => "cliffs"
+	];
+
+	public function loadMapDots(areaName:String)
+	{
+		if (!areaMap.exists(areaName)) return;
+
+		var baseDir:String = OGMO.project.getAbsoluteLevelPath(OGMO.project.mapDotsDir);
+		var dotFiles:Array<String> = sys.FileSystem.readDirectory(baseDir);
+		var filePrefix:String = areaMap[areaName];
+		var dotFilesFilter:Array<String> = dotFiles.filter(function (s) {return s.substr(0,filePrefix.length) == filePrefix;});
+		ArraySort.sort(dotFilesFilter, function (a, b) {
+			if (a < b) return 1;
+			if (a > b) return -1;
+			return 0;
+		});
+		if (dotFilesFilter.length == 0) return;
+
+		var dotFile:String = dotFilesFilter[0];
+		// Popup.open("hi", "entity", dotFile, ["wow"]);
+		var nameParts:Array<String> = dotFile.substr(0, dotFile.length - 4).split('_');
+		this._dotsOffsetX = Std.parseInt(nameParts[nameParts.length - 2]);
+		this._dotsOffsetY = Std.parseInt(nameParts[nameParts.length - 1]);
+
+		var fullDotsPathArr:Array<String> = [baseDir, dotFile];
+		var fullDotsPath:String = Path.join(fullDotsPathArr);
+
+		this._dotsTexture = Texture.fromFile(fullDotsPath);
+		this._lastDotsArea = areaName;
 	}
 
 	/*
